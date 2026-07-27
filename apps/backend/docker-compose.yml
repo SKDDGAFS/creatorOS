@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: creatoros-postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: creatoros
+      POSTGRES_PASSWORD: creatoros_password
+      POSTGRES_DB: creatoros
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
