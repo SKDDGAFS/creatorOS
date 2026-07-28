@@ -50,7 +50,11 @@ class Channel(Base):
     platform_channel_id: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(255))
     handle: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        server_default="true",
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utc_now,
@@ -63,11 +67,11 @@ class Channel(Base):
         onupdate=utc_now,
     )
 
-    user: Mapped["User"] = relationship(
+    user: Mapped[User] = relationship(
         back_populates="channels",
         cascade="save-update, merge",
     )
-    videos: Mapped[list["Video"]] = relationship(
+    videos: Mapped[list[Video]] = relationship(
         back_populates="channel",
         cascade="save-update, merge",
         passive_deletes=True,

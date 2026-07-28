@@ -11,7 +11,8 @@
 
 - Use synchronous SQLAlchemy 2.x with Psycopg 3.
 - Use UUID primary keys consistently for user-owned, externally referenced domain records.
-- Use PostgreSQL enum types for channel platform and video status.
+- Store channel platform and video status as strings with application enums and
+  named database `CHECK` constraints.
 - Keep ORM cascades non-destructive: relationships use `save-update, merge`; foreign keys default to `RESTRICT`. Historical data is not deleted implicitly.
 - Use Alembic as the production schema mechanism. `init_db.py` will only provide a connection check and will not call `create_all()`.
 - Make database health independently testable through dependency injection, so tests do not touch the developer database.
@@ -121,3 +122,40 @@
 2. Run the complete Pytest suite.
 3. Generate Alembic SQL through revision `0002` without modifying PostgreSQL.
 4. Confirm the working tree only contains Sprint 2 backend files.
+
+---
+
+# CreatorOS Repository Hardening Sprint
+
+## Goal
+
+Make the current local-development foundation safer and reproducible before
+adding analytics or publishing behavior.
+
+## Scope
+
+- Bind the development PostgreSQL port to localhost only.
+- Move the dashboard API origin into a documented public environment variable.
+- Repair dashboard encoding and metadata.
+- Add reproducible Python development dependencies and static checks.
+- Upgrade and audit dashboard dependencies without using unsafe forced fixes.
+- Add continuous integration and Dependabot configuration.
+- Add security, setup, rollback, and deployment-boundary documentation.
+
+## Safety boundaries
+
+- Do not change database tables or apply migrations.
+- Do not rotate the existing local PostgreSQL password automatically because the
+  persistent volume was initialized with the current credential.
+- Do not add authentication, analytics schema changes, or publishing behavior.
+- Do not recommend a public deployment while authentication and request controls
+  remain absent.
+- Do not merge while critical or high dependency findings remain unresolved.
+
+## Verification
+
+1. Run backend tests, Ruff, mypy, pip check, and pip-audit.
+2. Run dashboard lint, TypeScript, production build, and npm audit.
+3. Validate Docker Compose and Alembic state without changing the database.
+4. Inspect the final diff, ignored secrets, and repository status.
+5. Complete the sprint review gate and report remaining risks.

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     application_name: str = "CreatorOS API"
     environment: str = "development"
     debug: bool = False
-    database_url: str = "postgresql+psycopg://localhost/creatoros"
+    database_url: str = "postgresql+psycopg://127.0.0.1/creatoros"
     frontend_origin: str = "http://localhost:3000"
 
 

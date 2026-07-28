@@ -77,7 +77,7 @@ class VideoMetric(Base):
         server_default="0",
     )
 
-    video: Mapped["Video"] = relationship(
+    video: Mapped[Video] = relationship(
         back_populates="metrics",
         cascade="save-update, merge",
     )

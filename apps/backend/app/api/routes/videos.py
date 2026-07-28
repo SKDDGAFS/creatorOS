@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.api.errors import raise_service_http_error
 from app.db.session import get_db
-from app.models.video import VideoStatus
+from app.models.video import Video, VideoStatus
+from app.models.video_metric import VideoMetric
 from app.schemas.video import VideoCreate, VideoResponse, VideoUpdate
 from app.schemas.video_metric import VideoMetricCreate, VideoMetricResponse
 from app.services import video_service
 from app.services.errors import ServiceError
-
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 
@@ -24,7 +24,7 @@ router = APIRouter(prefix="/videos", tags=["videos"])
 def create_video(
     payload: VideoCreate,
     db: Session = Depends(get_db),
-) -> VideoResponse:
+) -> Video:
     try:
         return video_service.create_video(db, payload)
     except ServiceError as exc:
@@ -41,7 +41,7 @@ def list_videos(
         Query(alias="status"),
     ] = None,
     db: Session = Depends(get_db),
-) -> list[VideoResponse]:
+) -> list[Video]:
     return video_service.list_videos(
         db,
         limit=limit,
@@ -55,7 +55,7 @@ def list_videos(
 def get_video(
     video_id: UUID,
     db: Session = Depends(get_db),
-) -> VideoResponse:
+) -> Video:
     try:
         return video_service.get_video(db, video_id)
     except ServiceError as exc:
@@ -67,7 +67,7 @@ def update_video(
     video_id: UUID,
     payload: VideoUpdate,
     db: Session = Depends(get_db),
-) -> VideoResponse:
+) -> Video:
     try:
         return video_service.update_video(db, video_id, payload)
     except ServiceError as exc:
@@ -83,7 +83,7 @@ def create_metric(
     video_id: UUID,
     payload: VideoMetricCreate,
     db: Session = Depends(get_db),
-) -> VideoMetricResponse:
+) -> VideoMetric:
     try:
         return video_service.create_metric(db, video_id, payload)
     except ServiceError as exc:
@@ -100,7 +100,7 @@ def list_metrics(
     limit: Annotated[int, Query(ge=1, le=100)] = 100,
     offset: Annotated[int, Query(ge=0)] = 0,
     db: Session = Depends(get_db),
-) -> list[VideoMetricResponse]:
+) -> list[VideoMetric]:
     try:
         return video_service.list_metrics(
             db,
