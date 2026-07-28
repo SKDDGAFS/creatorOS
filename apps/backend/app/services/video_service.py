@@ -16,7 +16,6 @@ from app.services.errors import (
     ResourceNotFoundError,
 )
 
-
 MetricOrder = Literal["newest", "oldest"]
 
 
@@ -83,6 +82,7 @@ def update_video(
     changes = payload.model_dump(exclude_unset=True)
 
     if "status" in changes:
+        assert payload.status is not None
         changes["status"] = payload.status.value
 
     for field_name, value in changes.items():

@@ -80,6 +80,7 @@ def update_channel(
     changes = payload.model_dump(exclude_unset=True)
 
     if "platform" in changes:
+        assert payload.platform is not None
         changes["platform"] = payload.platform.value
 
     for field_name, value in changes.items():

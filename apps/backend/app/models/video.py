@@ -74,11 +74,11 @@ class Video(Base):
         onupdate=utc_now,
     )
 
-    channel: Mapped["Channel"] = relationship(
+    channel: Mapped[Channel] = relationship(
         back_populates="videos",
         cascade="save-update, merge",
     )
-    metrics: Mapped[list["VideoMetric"]] = relationship(
+    metrics: Mapped[list[VideoMetric]] = relationship(
         back_populates="video",
         cascade="save-update, merge",
         passive_deletes=True,

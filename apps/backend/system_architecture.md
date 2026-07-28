@@ -22,7 +22,7 @@ The safe template is `.env.example`. A real `.env` remains local and must not be
 committed. The expected local URL format is:
 
 ```text
-postgresql+psycopg://creatoros:creatoros_password@localhost:5432/creatoros
+postgresql+psycopg://creatoros:creatoros_password@127.0.0.1:5432/creatoros
 ```
 
 ## Database access
@@ -123,3 +123,38 @@ Metric snapshots are append-only. Their read endpoint supports `newest` and
 metric rules, so non-API writes cannot store negative counts or invalid rates.
 
 API examples and the complete route list are documented in `API.md`.
+
+## Repository hardening controls
+
+- Docker publishes the development PostgreSQL port on `127.0.0.1` only. The
+  Compose credential is a local default and is not suitable for shared or
+  production environments.
+- `requirements.txt` states supported direct dependency ranges.
+  `requirements.lock` records the exact tested environment, while
+  `requirements-dev.txt` adds pinned lint, type-check, and audit tools.
+- Ruff checks Python correctness, imports, and common bug patterns. Mypy checks
+  application and migration type contracts. Tests remain isolated from the local
+  database.
+- CI runs unit tests and static checks, applies Alembic migrations to a disposable
+  PostgreSQL 16 service, and audits Python dependencies.
+- Dashboard CI uses a clean npm install, Biome, TypeScript, a production Next.js
+  build, and an npm audit.
+- Dependabot proposes weekly Python and npm dependency updates. GitHub secret
+  scanning and push protection remain repository settings.
+
+The dashboard API origin is read from `NEXT_PUBLIC_API_URL`. Because values with
+the `NEXT_PUBLIC_` prefix are included in browser code, this variable must never
+contain a credential.
+
+Public deployment remains blocked until authentication, record-level
+authorization, request limits, production CORS, secret management, and operational
+monitoring are implemented and reviewed.
+
+## Analytics semantic debt
+
+The current metric schema treats omitted numeric values as zero. Analytics work
+must first define which platform fields can be unavailable and migrate those
+fields to nullable storage where needed. A genuine zero must remain distinct from
+missing or unsupported platform data. Click-through rate is currently stored as
+a decimal ratio; future ingestion must record whether it was platform-reported or
+derived.

@@ -6,11 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.api.errors import raise_service_http_error
 from app.db.session import get_db
-from app.models.channel import Platform
+from app.models.channel import Channel, Platform
 from app.schemas.channel import ChannelCreate, ChannelResponse, ChannelUpdate
 from app.services import channel_service
 from app.services.errors import ServiceError
-
 
 router = APIRouter(prefix="/channels", tags=["channels"])
 
@@ -23,7 +22,7 @@ router = APIRouter(prefix="/channels", tags=["channels"])
 def create_channel(
     payload: ChannelCreate,
     db: Session = Depends(get_db),
-) -> ChannelResponse:
+) -> Channel:
     try:
         return channel_service.create_channel(db, payload)
     except ServiceError as exc:
@@ -38,7 +37,7 @@ def list_channels(
     platform: Platform | None = None,
     is_active: bool | None = None,
     db: Session = Depends(get_db),
-) -> list[ChannelResponse]:
+) -> list[Channel]:
     return channel_service.list_channels(
         db,
         limit=limit,
@@ -53,7 +52,7 @@ def list_channels(
 def get_channel(
     channel_id: UUID,
     db: Session = Depends(get_db),
-) -> ChannelResponse:
+) -> Channel:
     try:
         return channel_service.get_channel(db, channel_id)
     except ServiceError as exc:
@@ -65,7 +64,7 @@ def update_channel(
     channel_id: UUID,
     payload: ChannelUpdate,
     db: Session = Depends(get_db),
-) -> ChannelResponse:
+) -> Channel:
     try:
         return channel_service.update_channel(db, channel_id, payload)
     except ServiceError as exc:

@@ -1,0 +1,24 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = [
+    "B008",  # FastAPI dependency injection intentionally uses call defaults.
+    "UP042", # Keep string enums explicit for Pydantic and API serialization.
+]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*.py" = ["I001"]
+
+[tool.mypy]
+python_version = "3.14"
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+exclude = ["tests", "venv"]

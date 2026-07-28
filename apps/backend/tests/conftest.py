@@ -6,13 +6,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-
 os.environ["DATABASE_URL"] = "sqlite+pysqlite:///:memory:"
 
 from app.db.base import Base  # noqa: E402
 from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402
-
 
 test_engine = create_engine(
     "sqlite+pysqlite://",

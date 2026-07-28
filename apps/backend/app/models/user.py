@@ -29,7 +29,7 @@ class User(Base):
         onupdate=utc_now,
     )
 
-    channels: Mapped[list["Channel"]] = relationship(
+    channels: Mapped[list[Channel]] = relationship(
         back_populates="user",
         cascade="save-update, merge",
         passive_deletes=True,

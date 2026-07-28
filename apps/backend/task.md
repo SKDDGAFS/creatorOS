@@ -20,3 +20,14 @@
 - [x] Add isolated API tests.
 - [x] Add endpoint and architecture documentation.
 - [x] Run tests, route inspection, and migration verification.
+
+# Repository hardening checklist
+
+- [x] Bind the local PostgreSQL port to localhost.
+- [x] Make the dashboard backend URL configurable and repair encoding.
+- [x] Add pinned Python development tooling and configuration.
+- [x] Upgrade and audit dashboard dependencies.
+- [x] Add CI and dependency update automation.
+- [x] Add security, setup, rollback, and deployment-boundary documentation.
+- [x] Run all backend, frontend, migration, Docker, and repository checks.
+- [x] Complete the sprint review gate.
