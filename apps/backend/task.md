@@ -42,3 +42,13 @@
 - [x] Remove client-controlled user ownership from channel creation.
 - [x] Add authentication, throttling, CSRF, role, and isolation tests.
 - [x] Update API, architecture, setup, and security documentation.
+
+# Analytics expansion checklist
+
+- [x] Make unavailable shared metrics nullable.
+- [x] Add shared reach, engagement, conversion, and first-hour fields.
+- [x] Add normalized retention, traffic, audience, geography, and discovery data.
+- [x] Add platform-matched TikTok, Instagram, and YouTube extensions.
+- [x] Compute safe derived rates without persisting stale values.
+- [x] Review and apply migration `0004` to local PostgreSQL.
+- [x] Add analytics service, validation, authorization, and constraint tests.

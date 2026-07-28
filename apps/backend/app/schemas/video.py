@@ -19,6 +19,7 @@ class VideoBase(BaseModel):
     platform_video_id: str | None = Field(default=None, max_length=255)
     title: str = Field(min_length=1, max_length=500)
     description: str | None = None
+    duration_seconds: int | None = Field(default=None, gt=0)
     status: VideoStatus = VideoStatus.DRAFT
     published_at: AwareDatetime | None = None
 
@@ -33,6 +34,7 @@ class VideoUpdate(BaseModel):
     platform_video_id: str | None = Field(default=None, max_length=255)
     title: str | None = Field(default=None, min_length=1, max_length=500)
     description: str | None = None
+    duration_seconds: int | None = Field(default=None, gt=0)
     status: VideoStatus | None = None
     published_at: AwareDatetime | None = None
 
