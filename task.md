@@ -17,4 +17,4 @@
 - [x] Add authentication, CSRF, role, and authorization tests.
 - [x] Update API, architecture, security, and setup documentation.
 - [x] Run backend quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open a draft Sprint B pull request.
+- [x] Commit, push, and open draft pull request #3.
