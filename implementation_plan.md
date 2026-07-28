@@ -83,3 +83,41 @@
 - Publishing integrations
 - Analytics ingestion
 - Frontend changes or redesign
+
+---
+
+# CreatorOS Backend Sprint 2: Core Channel and Video APIs
+
+## Scope
+
+- `[NEW] apps/backend/app/services/errors.py` — domain-safe service exceptions.
+- `[NEW] apps/backend/app/services/channel_service.py` — channel create, list, get, and partial update operations.
+- `[NEW] apps/backend/app/services/video_service.py` — video CRUD and append-only metric operations.
+- `[NEW] apps/backend/app/api/errors.py` — translates service errors into stable HTTP responses.
+- `[NEW] apps/backend/app/api/routes/channels.py` — channel HTTP endpoints, filters, and pagination.
+- `[NEW] apps/backend/app/api/routes/videos.py` — video and metric HTTP endpoints, filters, ordering, and pagination.
+- `[MODIFY] apps/backend/app/api/router.py` — register the new routers.
+- `[MODIFY] apps/backend/app/models/video_metric.py` — add database checks for non-negative metrics and a 0–1 click-through-rate convention.
+- `[NEW] apps/backend/alembic/versions/0002_metric_value_constraints.py` — apply the metric checks through Alembic.
+- `[MODIFY] apps/backend/tests/conftest.py` — isolate API tests in an in-memory SQLite database.
+- `[NEW] apps/backend/tests/test_core_apis.py` — cover success, validation, conflicts, filtering, pagination, and ordering.
+- `[NEW] apps/backend/API.md` — endpoint and request/response documentation.
+- `[MODIFY] apps/backend/system_architecture.md` — record Sprint 2 service and API conventions.
+- `[MODIFY] apps/backend/task.md` — track implementation and verification.
+
+## Decisions
+
+- Routes own HTTP status codes and query validation.
+- Services own database queries, parent validation, partial-update behavior, and transaction handling.
+- Service exceptions contain safe messages and are translated into `404`, `409`, or generic `500` responses.
+- List endpoints use `limit` and `offset`, cap `limit` at 100, and apply deterministic ordering.
+- Click-through rate is stored as a decimal ratio from 0 through 1 (`0.05` means 5%).
+- Metric history is append-only and can be read newest-first or oldest-first.
+- Test-only `Base.metadata.create_all()` is allowed for isolated SQLite tests; Alembic remains the production schema source of truth.
+
+## Verification
+
+1. Import the application and inspect registered routes.
+2. Run the complete Pytest suite.
+3. Generate Alembic SQL through revision `0002` without modifying PostgreSQL.
+4. Confirm the working tree only contains Sprint 2 backend files.

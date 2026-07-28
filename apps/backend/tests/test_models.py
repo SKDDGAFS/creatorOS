@@ -63,6 +63,25 @@ def test_video_metric_history_index_supports_time_queries() -> None:
     ]
 
 
+def test_video_metric_values_have_database_checks() -> None:
+    metric_checks = {
+        constraint.name
+        for constraint in VideoMetric.__table__.constraints
+        if isinstance(constraint, CheckConstraint)
+    }
+
+    assert {
+        "ck_video_metrics_views_nonnegative",
+        "ck_video_metrics_likes_nonnegative",
+        "ck_video_metrics_comments_nonnegative",
+        "ck_video_metrics_shares_nonnegative",
+        "ck_video_metrics_watch_time_seconds_nonnegative",
+        "ck_video_metrics_average_view_duration_seconds_nonnegative",
+        "ck_video_metrics_impressions_nonnegative",
+        "ck_video_metrics_click_through_rate_ratio",
+    } <= metric_checks
+
+
 def test_foreign_keys_are_restrictive() -> None:
     for column in (
         Channel.__table__.c.user_id,

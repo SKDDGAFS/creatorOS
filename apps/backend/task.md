@@ -9,3 +9,14 @@
 - [x] Add endpoint and model metadata tests.
 - [x] Run tests and migration verification.
 - [x] Record the architecture and operating commands.
+
+# Sprint 2 checklist
+
+- [x] Add channel, video, and metric Pydantic schemas.
+- [x] Add safe service exceptions and HTTP translation.
+- [x] Add channel service and routes.
+- [x] Add video and metric services and routes.
+- [x] Add metric database constraints and Alembic revision.
+- [x] Add isolated API tests.
+- [x] Add endpoint and architecture documentation.
+- [x] Run tests, route inspection, and migration verification.

@@ -99,3 +99,27 @@ Generate migration SQL without changing the database:
 ```powershell
 .\venv\Scripts\alembic.exe upgrade head --sql
 ```
+
+## Sprint 2 API boundary
+
+- `app/api/routes/channels.py` owns channel HTTP input, output, pagination,
+  filtering, and status codes.
+- `app/api/routes/videos.py` owns video and metric HTTP behavior.
+- `app/services/channel_service.py` and `app/services/video_service.py` own
+  business rules, SQLAlchemy queries, transactions, parent checks, and partial
+  updates.
+- `app/api/errors.py` converts safe service exceptions into stable HTTP `404`,
+  `409`, and generic `500` responses.
+- Pydantic schemas reject unsupported enum values, nulls for required update
+  fields, naive publishing timestamps, negative metrics, and click-through rates
+  outside the decimal ratio range of 0 through 1.
+
+All list endpoints use bounded `limit`/`offset` pagination and deterministic
+timestamp-plus-UUID ordering. Channel lists can filter by user, platform, and
+active state. Video lists can filter by channel and status.
+
+Metric snapshots are append-only. Their read endpoint supports `newest` and
+`oldest` ordering. Revision `0002` adds database checks matching the Pydantic
+metric rules, so non-API writes cannot store negative counts or invalid rates.
+
+API examples and the complete route list are documented in `API.md`.
