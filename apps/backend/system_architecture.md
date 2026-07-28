@@ -154,6 +154,23 @@ metric rules, so non-API writes cannot store negative counts or invalid rates.
 Revision `0004` expands nullable analytics, video duration, structured breakdowns,
 and platform extensions with named checks and restrictive foreign keys.
 
+## Growth-signal configuration
+
+- `GrowthSignalProfile` is workspace-owned and immutable except for deactivation.
+  Recreating a name allocates a new version for reproducible historical scoring.
+- Profile context includes platform, content format, account-size range,
+  video-duration range, goal, and evidence-volume range.
+- `GrowthSignalWeight` stores user-configured weight, advisory tier, minimum
+  sample size, and full-confidence sample size. No universal numerical weight is
+  hardcoded.
+- Scoring combines normalized observations with sample-size and source
+  confidence. It returns score, confidence, coverage, and auditable individual
+  contributions.
+- Missing observations reduce coverage. Insufficient samples contribute no
+  confidence. Interpretations explicitly describe associations as directional or
+  correlational rather than causal.
+- Revision `0005` adds the profile and weight tables.
+
 API examples and the complete route list are documented in `API.md`.
 
 ## Repository hardening controls

@@ -288,3 +288,25 @@ users inactive because they do not have passwords.
    scanning, and diff checks.
 3. Update API and architecture documentation.
 4. Commit, push, and open a draft pull request stacked on Sprint B.
+
+# Sprint D implementation plan: growth-signal configuration
+
+## Scope
+
+1. Add workspace-owned, versionable signal profiles scoped by platform, content
+   format, account-size range, video-length range, goal, and evidence volume.
+2. Add configurable positive weights for the roadmap signal catalog; strength
+   tiers are descriptive metadata and never determine permanent weights.
+3. Add minimum and full-confidence sample sizes per signal.
+4. Score normalized observations with source confidence, sample-size confidence,
+   evidence coverage, and explicit per-signal contributions.
+5. Keep profiles immutable after creation so historical scores remain
+   reproducible; new strategies use a new named/versioned profile.
+
+## Safety and verification
+
+- Profiles and all reads/scores are workspace isolated.
+- Every constraint and foreign key is named and restrictive.
+- Scores remain between zero and one and never imply causal certainty.
+- Review migration `0005` SQL before local application.
+- Add service, API, authorization, scoring, constraint, and edge-case tests.

@@ -31,3 +31,16 @@
 - [x] Update analytics API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open draft pull request #4.
+
+## Sprint D: Growth-signal configuration
+
+- [x] Add workspace-owned contextual signal profiles.
+- [x] Add configurable signal weights and descriptive tiers.
+- [x] Add sample-size and source-confidence handling.
+- [x] Add deterministic score, confidence, coverage, and contributions.
+- [x] Add profile and scoring APIs with workspace authorization.
+- [x] Add and review migration `0005`.
+- [x] Add service, API, authorization, and constraint tests.
+- [x] Update API and architecture documentation.
+- [x] Run quality, migration, dependency, and secret checks.
+- [ ] Commit, push, and open a draft Sprint D pull request.
