@@ -1,3 +1,13 @@
+from app.models.analytics import (
+    InstagramMetricExtension,
+    TikTokMetricExtension,
+    VideoAudienceDemographic,
+    VideoAudienceGeography,
+    VideoDiscoveryAsset,
+    VideoRetentionPoint,
+    VideoTrafficSource,
+    YouTubeMetricExtension,
+)
 from app.models.auth_session import AuthSession
 from app.models.auth_throttle import AuthThrottle
 from app.models.channel import Channel, Platform
@@ -11,13 +21,21 @@ __all__ = [
     "AuthSession",
     "AuthThrottle",
     "Channel",
+    "InstagramMetricExtension",
     "PasswordResetToken",
     "Platform",
+    "TikTokMetricExtension",
     "User",
     "Video",
+    "VideoAudienceDemographic",
+    "VideoAudienceGeography",
+    "VideoDiscoveryAsset",
     "VideoMetric",
+    "VideoRetentionPoint",
     "VideoStatus",
+    "VideoTrafficSource",
     "Workspace",
     "WorkspaceMembership",
     "WorkspaceRole",
+    "YouTubeMetricExtension",
 ]

@@ -40,6 +40,10 @@ class Video(Base):
             "platform_video_id",
             name="uq_videos_channel_id_platform_video_id",
         ),
+        CheckConstraint(
+            "duration_seconds IS NULL OR duration_seconds > 0",
+            name="duration_seconds_positive",
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -53,6 +57,7 @@ class Video(Base):
     )
     title: Mapped[str] = mapped_column(String(500))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    duration_seconds: Mapped[int | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(
         String(20),
         default=VideoStatus.DRAFT.value,

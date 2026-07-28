@@ -62,6 +62,7 @@ def create_video(
     platform_video_id: str | None = "video-1",
     title: str = "First Video",
     video_status: str = "draft",
+    duration_seconds: int | None = None,
 ) -> dict:
     response = client.post(
         "/api/videos",
@@ -71,6 +72,7 @@ def create_video(
             "platform_video_id": platform_video_id,
             "title": title,
             "description": "A test video",
+            "duration_seconds": duration_seconds,
             "status": video_status,
         },
     )

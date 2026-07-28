@@ -7,6 +7,7 @@ from app.services.errors import (
     AuthenticationError,
     AuthorizationError,
     ConflictError,
+    InvalidRequestError,
     PersistenceError,
     RateLimitError,
     ResourceNotFoundError,
@@ -19,6 +20,8 @@ def service_error_status(error: ServiceError) -> int:
         status_code = status.HTTP_404_NOT_FOUND
     elif isinstance(error, ConflictError):
         status_code = status.HTTP_409_CONFLICT
+    elif isinstance(error, InvalidRequestError):
+        status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     elif isinstance(error, AuthenticationError):
         status_code = status.HTTP_401_UNAUTHORIZED
     elif isinstance(error, AuthorizationError):

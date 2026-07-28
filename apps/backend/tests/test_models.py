@@ -5,12 +5,20 @@ from app.models import (
     AuthSession,
     AuthThrottle,
     Channel,
+    InstagramMetricExtension,
     PasswordResetToken,
+    TikTokMetricExtension,
     User,
     Video,
+    VideoAudienceDemographic,
+    VideoAudienceGeography,
+    VideoDiscoveryAsset,
     VideoMetric,
+    VideoRetentionPoint,
+    VideoTrafficSource,
     Workspace,
     WorkspaceMembership,
+    YouTubeMetricExtension,
 )
 
 
@@ -29,6 +37,14 @@ def test_all_domain_tables_are_registered() -> None:
         "channels",
         "videos",
         "video_metrics",
+        "video_retention_points",
+        "video_traffic_sources",
+        "video_audience_demographics",
+        "video_audience_geography",
+        "video_discovery_assets",
+        "tiktok_metric_extensions",
+        "instagram_metric_extensions",
+        "youtube_metric_extensions",
     } <= set(Base.metadata.tables)
 
 
@@ -110,6 +126,80 @@ def test_video_metric_values_have_database_checks() -> None:
     } <= metric_checks
 
 
+def test_unavailable_shared_metrics_are_nullable() -> None:
+    nullable_fields = (
+        "views",
+        "unique_viewers",
+        "engaged_views",
+        "completed_views",
+        "likes",
+        "comments",
+        "shares",
+        "saves",
+        "impressions",
+        "views_from_impressions",
+        "watch_time_seconds",
+        "average_view_duration_seconds",
+        "followers_gained",
+        "followers_lost",
+        "new_viewers",
+        "returning_viewers",
+        "first_hour_views",
+        "first_hour_likes",
+        "first_hour_comments",
+        "first_hour_shares",
+        "first_hour_saves",
+        "first_hour_watch_time_seconds",
+        "first_hour_followers_gained",
+        "first_hour_impressions",
+        "click_through_rate",
+    )
+
+    assert all(
+        VideoMetric.__table__.c[field_name].nullable
+        and VideoMetric.__table__.c[field_name].server_default is None
+        for field_name in nullable_fields
+    )
+
+
+def test_structured_analytics_have_named_uniqueness_constraints() -> None:
+    expected = (
+        (
+            VideoRetentionPoint,
+            "uq_video_retention_points_metric_position",
+        ),
+        (
+            VideoTrafficSource,
+            "uq_video_traffic_sources_metric_source",
+        ),
+        (
+            VideoAudienceDemographic,
+            "uq_video_audience_demographics_metric_segment",
+        ),
+        (
+            VideoAudienceGeography,
+            "uq_video_audience_geography_metric_country",
+        ),
+        (
+            VideoDiscoveryAsset,
+            "uq_video_discovery_assets_metric_asset",
+        ),
+    )
+    for model, constraint_name in expected:
+        assert constraint_name in constraint_names(model)
+
+
+def test_platform_extensions_are_one_to_one_with_metric() -> None:
+    for model in (
+        TikTokMetricExtension,
+        InstagramMetricExtension,
+        YouTubeMetricExtension,
+    ):
+        metric_id = model.__table__.c.video_metric_id
+        assert metric_id.primary_key
+        assert isinstance(metric_id.type, Uuid)
+
+
 def test_foreign_keys_are_restrictive() -> None:
     for column in (
         WorkspaceMembership.__table__.c.workspace_id,
@@ -120,6 +210,14 @@ def test_foreign_keys_are_restrictive() -> None:
         Channel.__table__.c.workspace_id,
         Video.__table__.c.channel_id,
         VideoMetric.__table__.c.video_id,
+        VideoRetentionPoint.__table__.c.video_metric_id,
+        VideoTrafficSource.__table__.c.video_metric_id,
+        VideoAudienceDemographic.__table__.c.video_metric_id,
+        VideoAudienceGeography.__table__.c.video_metric_id,
+        VideoDiscoveryAsset.__table__.c.video_metric_id,
+        TikTokMetricExtension.__table__.c.video_metric_id,
+        InstagramMetricExtension.__table__.c.video_metric_id,
+        YouTubeMetricExtension.__table__.c.video_metric_id,
     ):
         foreign_key = next(iter(column.foreign_keys))
         assert foreign_key.ondelete == "RESTRICT"
@@ -130,6 +228,11 @@ def test_relationships_do_not_delete_related_records() -> None:
         User.channels,
         Channel.videos,
         Video.metrics,
+        VideoMetric.retention_points,
+        VideoMetric.traffic_sources,
+        VideoMetric.demographics,
+        VideoMetric.geography,
+        VideoMetric.discovery_assets,
     )
 
     for relationship in relationships:

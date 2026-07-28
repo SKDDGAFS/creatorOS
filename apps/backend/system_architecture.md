@@ -66,6 +66,14 @@ postgresql+psycopg://creatoros:creatoros_password@127.0.0.1:5432/creatoros
   under its channel/video unique constraint.
 - Video metrics are appendable snapshots. The `(video_id, captured_at)` index
   supports historical time-series queries.
+- Shared analytics fields are nullable. A null means unavailable or unsupported;
+  zero remains a genuine reported zero.
+- Retention points, traffic sources, demographics, geography, and discovery
+  assets are normalized child records owned by one metric snapshot.
+- TikTok, Instagram, and YouTube extensions are one-to-one snapshot records.
+  The service rejects extensions that do not match the channel platform.
+- Rates are derived only from complete inputs with a nonzero denominator.
+  Derived values are returned by the API and not stored.
 
 ## Data retention
 
@@ -143,6 +151,8 @@ the active workspace.
 Metric snapshots are append-only. Their read endpoint supports `newest` and
 `oldest` ordering. Revision `0002` adds database checks matching the Pydantic
 metric rules, so non-API writes cannot store negative counts or invalid rates.
+Revision `0004` expands nullable analytics, video duration, structured breakdowns,
+and platform extensions with named checks and restrictive foreign keys.
 
 API examples and the complete route list are documented in `API.md`.
 
@@ -172,11 +182,11 @@ Public deployment remains blocked until general request limits, production CORS,
 trusted hosts, secret management, TLS/network controls, and operational
 monitoring are implemented and reviewed.
 
-## Analytics semantic debt
+## Analytics semantics
 
-The current metric schema treats omitted numeric values as zero. Analytics work
-must first define which platform fields can be unavailable and migrate those
-fields to nullable storage where needed. A genuine zero must remain distinct from
-missing or unsupported platform data. Click-through rate is currently stored as
-a decimal ratio; future ingestion must record whether it was platform-reported or
-derived.
+Metric inputs retain source meaning: unavailable fields are null, reported zeros
+remain zero, and click-through rates use decimal ratios. The shared
+`click_through_rate` can represent a normalized source value; YouTube's explicitly
+reported impressions CTR is retained separately in its extension. Future
+platform adapters must map official source fields without filling unsupported
+measurements.

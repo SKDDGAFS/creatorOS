@@ -252,3 +252,39 @@ users inactive because they do not have passwords.
 - OAuth or social-platform credentials.
 - Public deployment.
 - Automatic pull-request merging.
+
+# Sprint C implementation plan: analytics schema expansion
+
+## Scope
+
+1. Change shared snapshot measurements to nullable values so unavailable data is
+   not stored as a fabricated zero.
+2. Add shared reach, engagement, follower, audience, completion, and first-hour
+   measurements without duplicating existing fields.
+3. Compute rates from complete source measurements at response time; return null
+   when a denominator or required source value is unavailable.
+4. Store retention points, traffic sources, demographics, geography, and
+   discovery assets in typed child records.
+5. Add one-to-one TikTok, Instagram, and YouTube metric extensions and reject an
+   extension that does not match the video's channel platform.
+6. Preserve append-only snapshots and workspace authorization.
+
+## Data rules
+
+- Counts and durations are nullable and non-negative when supplied.
+- Ratios use decimal storage and must be between zero and one.
+- A video duration is optional and positive when supplied.
+- Child records use restrictive foreign keys, named uniqueness constraints, and
+  no destructive ORM cascades.
+- Derived rates are absent rather than misleading when inputs are incomplete.
+- Revision `0004` is forward-only during this sprint and must be reviewed in
+  offline SQL before local application.
+
+## Verification
+
+1. Test nullable semantics, each structured child type, platform matching,
+   derived rates, constraints, append-only history, and workspace isolation.
+2. Run Ruff, mypy, Pytest, pip-audit, Alembic current/drift/offline SQL, secret
+   scanning, and diff checks.
+3. Update API and architecture documentation.
+4. Commit, push, and open a draft pull request stacked on Sprint B.

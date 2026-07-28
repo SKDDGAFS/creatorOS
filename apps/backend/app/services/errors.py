@@ -10,6 +10,10 @@ class ConflictError(ServiceError):
     """Raised when a write conflicts with an existing record."""
 
 
+class InvalidRequestError(ServiceError):
+    """Raised when valid input conflicts with a domain rule."""
+
+
 class PersistenceError(ServiceError):
     """Raised when a database write fails for a non-conflict reason."""
 

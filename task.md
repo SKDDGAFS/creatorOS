@@ -18,3 +18,16 @@
 - [x] Update API, architecture, security, and setup documentation.
 - [x] Run backend quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open draft pull request #3.
+
+## Sprint C: Analytics schema expansion
+
+- [x] Make unavailable shared metrics nullable.
+- [x] Add shared and first-hour analytics fields.
+- [x] Add retention, traffic, audience, geography, and discovery records.
+- [x] Add TikTok, Instagram, and YouTube extensions.
+- [x] Add safe derived metrics and platform validation.
+- [x] Add and review migration `0004`.
+- [x] Add analytics service, API, constraint, and authorization tests.
+- [x] Update analytics API and architecture documentation.
+- [x] Run quality, migration, dependency, and secret checks.
+- [x] Commit, push, and open draft pull request #4.
