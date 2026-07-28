@@ -3,7 +3,15 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Numeric, func
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Numeric,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, utc_now
@@ -15,6 +23,23 @@ if TYPE_CHECKING:
 class VideoMetric(Base):
     __tablename__ = "video_metrics"
     __table_args__ = (
+        CheckConstraint("views >= 0", name="views_nonnegative"),
+        CheckConstraint("likes >= 0", name="likes_nonnegative"),
+        CheckConstraint("comments >= 0", name="comments_nonnegative"),
+        CheckConstraint("shares >= 0", name="shares_nonnegative"),
+        CheckConstraint(
+            "watch_time_seconds >= 0",
+            name="watch_time_seconds_nonnegative",
+        ),
+        CheckConstraint(
+            "average_view_duration_seconds >= 0",
+            name="average_view_duration_seconds_nonnegative",
+        ),
+        CheckConstraint("impressions >= 0", name="impressions_nonnegative"),
+        CheckConstraint(
+            "click_through_rate >= 0 AND click_through_rate <= 1",
+            name="click_through_rate_ratio",
+        ),
         Index(
             "ix_video_metrics_video_id_captured_at",
             "video_id",
