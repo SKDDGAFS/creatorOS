@@ -31,3 +31,14 @@
 - [x] Add security, setup, rollback, and deployment-boundary documentation.
 - [x] Run all backend, frontend, migration, Docker, and repository checks.
 - [x] Complete the sprint review gate.
+
+# Authentication and ownership checklist
+
+- [x] Add Argon2id password hashing and secure token helpers.
+- [x] Add sessions, throttles, reset-token storage, workspaces, and memberships.
+- [x] Review and apply ownership migration `0003` to local PostgreSQL.
+- [x] Add registration, login, current-user, logout, and workspace endpoints.
+- [x] Enforce CSRF, membership roles, and workspace resource isolation.
+- [x] Remove client-controlled user ownership from channel creation.
+- [x] Add authentication, throttling, CSRF, role, and isolation tests.
+- [x] Update API, architecture, setup, and security documentation.

@@ -1,7 +1,17 @@
 from sqlalchemy import CheckConstraint, UniqueConstraint, Uuid
 
 from app.db.base import Base
-from app.models import Channel, User, Video, VideoMetric
+from app.models import (
+    AuthSession,
+    AuthThrottle,
+    Channel,
+    PasswordResetToken,
+    User,
+    Video,
+    VideoMetric,
+    Workspace,
+    WorkspaceMembership,
+)
 
 
 def constraint_names(model: type) -> set[str | None]:
@@ -9,13 +19,31 @@ def constraint_names(model: type) -> set[str | None]:
 
 
 def test_all_domain_tables_are_registered() -> None:
-    assert {"users", "channels", "videos", "video_metrics"} <= set(
-        Base.metadata.tables
-    )
+    assert {
+        "users",
+        "workspaces",
+        "workspace_memberships",
+        "auth_sessions",
+        "auth_throttles",
+        "password_reset_tokens",
+        "channels",
+        "videos",
+        "video_metrics",
+    } <= set(Base.metadata.tables)
 
 
 def test_models_use_uuid_primary_keys() -> None:
-    for model in (User, Channel, Video, VideoMetric):
+    for model in (
+        User,
+        Workspace,
+        WorkspaceMembership,
+        AuthSession,
+        AuthThrottle,
+        PasswordResetToken,
+        Channel,
+        Video,
+        VideoMetric,
+    ):
         id_column = model.__table__.c.id
         assert id_column.primary_key
         assert isinstance(id_column.type, Uuid)
@@ -84,7 +112,12 @@ def test_video_metric_values_have_database_checks() -> None:
 
 def test_foreign_keys_are_restrictive() -> None:
     for column in (
+        WorkspaceMembership.__table__.c.workspace_id,
+        WorkspaceMembership.__table__.c.user_id,
+        AuthSession.__table__.c.user_id,
+        PasswordResetToken.__table__.c.user_id,
         Channel.__table__.c.user_id,
+        Channel.__table__.c.workspace_id,
         Video.__table__.c.channel_id,
         VideoMetric.__table__.c.video_id,
     ):

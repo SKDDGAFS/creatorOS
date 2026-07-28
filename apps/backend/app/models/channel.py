@@ -19,6 +19,7 @@ from app.db.base import Base, utc_now
 if TYPE_CHECKING:
     from app.models.user import User
     from app.models.video import Video
+    from app.models.workspace import Workspace
 
 
 class Platform(str, Enum):
@@ -46,6 +47,10 @@ class Channel(Base):
         ForeignKey("users.id", ondelete="RESTRICT"),
         index=True,
     )
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="RESTRICT"),
+        index=True,
+    )
     platform: Mapped[str] = mapped_column(String(20))
     platform_channel_id: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(255))
@@ -68,6 +73,10 @@ class Channel(Base):
     )
 
     user: Mapped[User] = relationship(
+        back_populates="channels",
+        cascade="save-update, merge",
+    )
+    workspace: Mapped[Workspace] = relationship(
         back_populates="channels",
         cascade="save-update, merge",
     )

@@ -19,8 +19,26 @@ from app.services.errors import (
 MetricOrder = Literal["newest", "oldest"]
 
 
-def create_video(db: Session, payload: VideoCreate) -> Video:
-    if db.get(Channel, payload.channel_id) is None:
+def _get_workspace_channel(
+    db: Session,
+    channel_id: UUID,
+    workspace_id: UUID,
+) -> Channel | None:
+    return db.scalar(
+        select(Channel).where(
+            Channel.id == channel_id,
+            Channel.workspace_id == workspace_id,
+        )
+    )
+
+
+def create_video(
+    db: Session,
+    payload: VideoCreate,
+    *,
+    workspace_id: UUID,
+) -> Video:
+    if _get_workspace_channel(db, payload.channel_id, workspace_id) is None:
         raise ResourceNotFoundError("Channel not found")
 
     values = payload.model_dump()
@@ -48,10 +66,15 @@ def list_videos(
     *,
     limit: int,
     offset: int,
+    workspace_id: UUID,
     channel_id: UUID | None = None,
     status: VideoStatus | None = None,
 ) -> list[Video]:
-    statement: Select[tuple[Video]] = select(Video)
+    statement: Select[tuple[Video]] = (
+        select(Video)
+        .join(Channel)
+        .where(Channel.workspace_id == workspace_id)
+    )
 
     if channel_id is not None:
         statement = statement.where(Video.channel_id == channel_id)
@@ -66,8 +89,20 @@ def list_videos(
     return list(db.scalars(statement).all())
 
 
-def get_video(db: Session, video_id: UUID) -> Video:
-    video = db.get(Video, video_id)
+def get_video(
+    db: Session,
+    video_id: UUID,
+    *,
+    workspace_id: UUID,
+) -> Video:
+    video = db.scalar(
+        select(Video)
+        .join(Channel)
+        .where(
+            Video.id == video_id,
+            Channel.workspace_id == workspace_id,
+        )
+    )
     if video is None:
         raise ResourceNotFoundError("Video not found")
     return video
@@ -77,8 +112,10 @@ def update_video(
     db: Session,
     video_id: UUID,
     payload: VideoUpdate,
+    *,
+    workspace_id: UUID,
 ) -> Video:
-    video = get_video(db, video_id)
+    video = get_video(db, video_id, workspace_id=workspace_id)
     changes = payload.model_dump(exclude_unset=True)
 
     if "status" in changes:
@@ -107,8 +144,10 @@ def create_metric(
     db: Session,
     video_id: UUID,
     payload: VideoMetricCreate,
+    *,
+    workspace_id: UUID,
 ) -> VideoMetric:
-    get_video(db, video_id)
+    get_video(db, video_id, workspace_id=workspace_id)
 
     values = payload.model_dump(exclude={"captured_at"})
     if payload.captured_at is not None:
@@ -131,11 +170,12 @@ def list_metrics(
     db: Session,
     video_id: UUID,
     *,
+    workspace_id: UUID,
     order: MetricOrder,
     limit: int,
     offset: int,
 ) -> list[VideoMetric]:
-    get_video(db, video_id)
+    get_video(db, video_id, workspace_id=workspace_id)
 
     if order == "newest":
         ordering = (

@@ -17,6 +17,10 @@
 - `DEBUG`
 - `DATABASE_URL`
 - `FRONTEND_ORIGIN`
+- `SESSION_COOKIE_NAME`
+- `CSRF_COOKIE_NAME`
+- `SESSION_COOKIE_SECURE`
+- authentication expiry and login throttle settings
 
 The safe template is `.env.example`. A real `.env` remains local and must not be
 committed. The expected local URL format is:
@@ -32,6 +36,23 @@ postgresql+psycopg://creatoros:creatoros_password@127.0.0.1:5432/creatoros
 - `pool_pre_ping=True` detects stale pooled connections.
 - `init_db.py` contains only a read-only connectivity query. It never calls
   `Base.metadata.create_all()`.
+
+## Authentication and ownership
+
+- Passwords use `pwdlib`'s recommended Argon2id hash. Plaintext passwords are
+  never stored.
+- Login creates an opaque random session token and a separate CSRF token. Only
+  their SHA-256 hashes are persisted.
+- Authentication is carried by an HTTP-only, `SameSite=Lax` cookie. Authenticated
+  writes require a matching CSRF cookie/header pair bound to the session.
+- Login throttles are persisted by a one-way hash of the normalized email, so
+  throttling works across application workers without storing the identifier.
+- Every user receives a personal workspace and owner membership. Workspace roles
+  are owner, admin, member, and viewer.
+- Channel ownership is derived server-side from the session and active workspace.
+  Videos and metrics inherit authorization through their channel.
+- Revision `0003` disables legacy passwordless users, backfills personal
+  workspaces, and adds the authentication tables.
 
 ## Domain model
 
@@ -115,8 +136,9 @@ Generate migration SQL without changing the database:
   outside the decimal ratio range of 0 through 1.
 
 All list endpoints use bounded `limit`/`offset` pagination and deterministic
-timestamp-plus-UUID ordering. Channel lists can filter by user, platform, and
-active state. Video lists can filter by channel and status.
+timestamp-plus-UUID ordering. Channel lists can filter by platform and active
+state. Video lists can filter by channel and status. Every query is scoped to
+the active workspace.
 
 Metric snapshots are append-only. Their read endpoint supports `newest` and
 `oldest` ordering. Revision `0002` adds database checks matching the Pydantic
@@ -146,8 +168,8 @@ The dashboard API origin is read from `NEXT_PUBLIC_API_URL`. Because values with
 the `NEXT_PUBLIC_` prefix are included in browser code, this variable must never
 contain a credential.
 
-Public deployment remains blocked until authentication, record-level
-authorization, request limits, production CORS, secret management, and operational
+Public deployment remains blocked until general request limits, production CORS,
+trusted hosts, secret management, TLS/network controls, and operational
 monitoring are implemented and reviewed.
 
 ## Analytics semantic debt

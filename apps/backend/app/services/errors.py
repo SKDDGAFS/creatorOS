@@ -12,3 +12,15 @@ class ConflictError(ServiceError):
 
 class PersistenceError(ServiceError):
     """Raised when a database write fails for a non-conflict reason."""
+
+
+class AuthenticationError(ServiceError):
+    """Raised when authentication credentials are absent or invalid."""
+
+
+class AuthorizationError(ServiceError):
+    """Raised when an authenticated user lacks access."""
+
+
+class RateLimitError(ServiceError):
+    """Raised when an authentication throttle is active."""

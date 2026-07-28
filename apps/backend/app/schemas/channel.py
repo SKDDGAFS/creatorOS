@@ -18,7 +18,7 @@ class ChannelBase(BaseModel):
 
 
 class ChannelCreate(ChannelBase):
-    user_id: UUID
+    pass
 
 
 class ChannelUpdate(BaseModel):
@@ -55,5 +55,6 @@ class ChannelResponse(ChannelBase):
 
     id: UUID
     user_id: UUID
+    workspace_id: UUID
     created_at: datetime
     updated_at: datetime

@@ -159,3 +159,96 @@ adding analytics or publishing behavior.
 3. Validate Docker Compose and Alembic state without changing the database.
 4. Inspect the final diff, ignored secrets, and repository status.
 5. Complete the sprint review gate and report remaining risks.
+
+---
+
+# CreatorOS Sprint B: Authentication and Ownership
+
+## Goal
+
+Replace client-supplied ownership with authenticated, workspace-scoped access
+while preserving existing channel, video, and metric data.
+
+## Security design
+
+- Hash passwords with Argon2id through `pwdlib`.
+- Store only SHA-256 hashes of cryptographically random session and reset tokens.
+- Send the session identifier only in an HTTP-only, same-site cookie.
+- Bind a separate CSRF token to each server-side session and require it on
+  authenticated state-changing requests.
+- Apply generic login failures and database-backed throttling.
+- Require active users and unexpired, non-revoked sessions.
+- Resolve ownership through workspace membership, never request `user_id`.
+
+## Planned files
+
+### Configuration and security
+
+- `[MODIFY] apps/backend/app/core/config.py`
+- `[NEW] apps/backend/app/core/security.py`
+- `[MODIFY] apps/backend/.env.example`
+- `[MODIFY] apps/backend/requirements.txt`
+- `[MODIFY] apps/backend/requirements.lock`
+
+### Models and migration
+
+- `[MODIFY] apps/backend/app/models/user.py`
+- `[MODIFY] apps/backend/app/models/channel.py`
+- `[NEW] apps/backend/app/models/workspace.py`
+- `[NEW] apps/backend/app/models/auth_session.py`
+- `[NEW] apps/backend/app/models/auth_throttle.py`
+- `[NEW] apps/backend/app/models/password_reset_token.py`
+- `[MODIFY] apps/backend/app/models/__init__.py`
+- `[NEW] apps/backend/alembic/versions/0003_authentication_and_ownership.py`
+
+The migration will create a personal workspace and owner membership for every
+existing user, attach existing channels to those workspaces, and mark legacy
+users inactive because they do not have passwords.
+
+### Schemas, services, and dependencies
+
+- `[NEW] apps/backend/app/schemas/auth.py`
+- `[NEW] apps/backend/app/schemas/workspace.py`
+- `[MODIFY] apps/backend/app/schemas/channel.py`
+- `[NEW] apps/backend/app/services/auth_service.py`
+- `[NEW] apps/backend/app/services/workspace_service.py`
+- `[MODIFY] apps/backend/app/services/channel_service.py`
+- `[MODIFY] apps/backend/app/services/video_service.py`
+- `[MODIFY] apps/backend/app/services/errors.py`
+- `[NEW] apps/backend/app/api/dependencies/auth.py`
+
+### Routes
+
+- `[NEW] apps/backend/app/api/routes/auth.py`
+- `[NEW] apps/backend/app/api/routes/workspaces.py`
+- `[MODIFY] apps/backend/app/api/routes/channels.py`
+- `[MODIFY] apps/backend/app/api/routes/videos.py`
+- `[MODIFY] apps/backend/app/api/router.py`
+
+### Tests and documentation
+
+- `[MODIFY] apps/backend/tests/conftest.py`
+- `[NEW] apps/backend/tests/test_auth.py`
+- `[NEW] apps/backend/tests/test_authorization.py`
+- `[MODIFY] apps/backend/tests/test_core_apis.py`
+- `[MODIFY] apps/backend/tests/test_models.py`
+- `[MODIFY] apps/backend/API.md`
+- `[MODIFY] apps/backend/system_architecture.md`
+- `[MODIFY] README.md`
+
+## Verification
+
+1. Test registration, login, logout, session expiry, CSRF, throttling, disabled
+   accounts, workspaces, roles, and cross-workspace access denial.
+2. Run Ruff, mypy, Pytest, and pip-audit.
+3. Review migration SQL before applying revision `0003`.
+4. Apply `0003` only to the confirmed local development database.
+5. Run Alembic current, drift, and offline SQL checks.
+6. Review secrets, staged files, and the complete diff.
+
+## Out of scope
+
+- Email delivery for password resets.
+- OAuth or social-platform credentials.
+- Public deployment.
+- Automatic pull-request merging.

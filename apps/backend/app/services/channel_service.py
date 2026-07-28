@@ -5,7 +5,6 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.models.channel import Channel, Platform
-from app.models.user import User
 from app.schemas.channel import ChannelCreate, ChannelUpdate
 from app.services.errors import (
     ConflictError,
@@ -14,13 +13,20 @@ from app.services.errors import (
 )
 
 
-def create_channel(db: Session, payload: ChannelCreate) -> Channel:
-    if db.get(User, payload.user_id) is None:
-        raise ResourceNotFoundError("User not found")
-
+def create_channel(
+    db: Session,
+    payload: ChannelCreate,
+    *,
+    user_id: UUID,
+    workspace_id: UUID,
+) -> Channel:
     values = payload.model_dump()
     values["platform"] = payload.platform.value
-    channel = Channel(**values)
+    channel = Channel(
+        **values,
+        user_id=user_id,
+        workspace_id=workspace_id,
+    )
     db.add(channel)
 
     try:
@@ -43,14 +49,13 @@ def list_channels(
     *,
     limit: int,
     offset: int,
-    user_id: UUID | None = None,
+    workspace_id: UUID,
     platform: Platform | None = None,
     is_active: bool | None = None,
 ) -> list[Channel]:
-    statement: Select[tuple[Channel]] = select(Channel)
-
-    if user_id is not None:
-        statement = statement.where(Channel.user_id == user_id)
+    statement: Select[tuple[Channel]] = select(Channel).where(
+        Channel.workspace_id == workspace_id
+    )
     if platform is not None:
         statement = statement.where(Channel.platform == platform.value)
     if is_active is not None:
@@ -64,8 +69,18 @@ def list_channels(
     return list(db.scalars(statement).all())
 
 
-def get_channel(db: Session, channel_id: UUID) -> Channel:
-    channel = db.get(Channel, channel_id)
+def get_channel(
+    db: Session,
+    channel_id: UUID,
+    *,
+    workspace_id: UUID,
+) -> Channel:
+    channel = db.scalar(
+        select(Channel).where(
+            Channel.id == channel_id,
+            Channel.workspace_id == workspace_id,
+        )
+    )
     if channel is None:
         raise ResourceNotFoundError("Channel not found")
     return channel
@@ -75,8 +90,10 @@ def update_channel(
     db: Session,
     channel_id: UUID,
     payload: ChannelUpdate,
+    *,
+    workspace_id: UUID,
 ) -> Channel:
-    channel = get_channel(db, channel_id)
+    channel = get_channel(db, channel_id, workspace_id=workspace_id)
     changes = payload.model_dump(exclude_unset=True)
 
     if "platform" in changes:
