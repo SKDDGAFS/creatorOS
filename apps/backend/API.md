@@ -1,14 +1,56 @@
-# CreatorOS core API
+# CreatorOS authenticated API
 
-The local API defaults to `http://127.0.0.1:8000`. Interactive OpenAPI
-documentation is available at `/docs`.
+The local API defaults to `http://127.0.0.1:8000`; OpenAPI documentation is at
+`/docs`.
+
+## Authentication
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Create a user, personal workspace, and session |
+| `POST` | `/api/auth/login` | Create a session |
+| `GET` | `/api/auth/me` | Read the active user |
+| `POST` | `/api/auth/logout` | Revoke the active session |
+
+Register:
+
+```json
+{
+  "email": "creator@example.com",
+  "display_name": "Creator",
+  "password": "a long unique passphrase"
+}
+```
+
+Register and login set `creatoros_session` as an HTTP-only cookie and
+`creatoros_csrf` as a readable cookie. Their response also includes
+`csrf_token`. Send that value as `X-CSRF-Token` on authenticated write requests.
+The browser must include credentials.
+
+## Workspaces and authorization
+
+| Method | Path | Access |
+| --- | --- | --- |
+| `GET` | `/api/workspaces` | Authenticated memberships |
+| `POST` | `/api/workspaces` | Authenticated + CSRF |
+| `POST` | `/api/workspaces/{workspace_id}/members` | Owner/admin + CSRF |
+
+All channel, video, and metric requests require:
+
+```text
+X-Workspace-ID: 11111111-1111-1111-1111-111111111111
+```
+
+The API verifies membership. Roles are `owner`, `admin`, `member`, and `viewer`;
+viewers cannot write. A resource outside the active workspace is returned as
+not found so records cannot be enumerated across workspaces.
 
 ## Channels
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/channels` | Create a channel for an existing user |
-| `GET` | `/api/channels` | List and filter channels |
+| `POST` | `/api/channels` | Create in the active workspace |
+| `GET` | `/api/channels` | List/filter active-workspace channels |
 | `GET` | `/api/channels/{channel_id}` | Get one channel |
 | `PATCH` | `/api/channels/{channel_id}` | Partially update one channel |
 
@@ -16,7 +58,6 @@ Create request:
 
 ```json
 {
-  "user_id": "11111111-1111-1111-1111-111111111111",
   "platform": "youtube",
   "platform_channel_id": "UC-example",
   "name": "CreatorOS",
@@ -25,111 +66,35 @@ Create request:
 }
 ```
 
-The `user_id` must already exist in the `users` table. Supported platforms are
-`youtube`, `tiktok`, and `instagram`.
+The authenticated user and workspace become the owners; clients cannot provide
+`user_id`. Supported platforms are `youtube`, `tiktok`, and `instagram`. List
+filters are `platform`, `is_active`, `limit`, and `offset`.
 
-List filters:
-
-```text
-GET /api/channels?user_id={uuid}&platform=youtube&is_active=true&limit=20&offset=0
-```
-
-## Videos
+## Videos and metric snapshots
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/videos` | Create a video for an existing channel |
-| `GET` | `/api/videos` | List and filter videos |
+| `POST` | `/api/videos` | Create for an active-workspace channel |
+| `GET` | `/api/videos` | List/filter videos |
 | `GET` | `/api/videos/{video_id}` | Get one video |
 | `PATCH` | `/api/videos/{video_id}` | Partially update one video |
-
-Create request:
-
-```json
-{
-  "channel_id": "22222222-2222-2222-2222-222222222222",
-  "platform_video_id": null,
-  "title": "My next video",
-  "description": "Draft description",
-  "status": "draft",
-  "published_at": null
-}
-```
-
-Supported statuses are `draft`, `scheduled`, `published`, and `failed`.
-`platform_video_id` can remain null until an external platform assigns one.
-Any supplied `published_at` must contain a timezone offset.
-
-List filters:
-
-```text
-GET /api/videos?channel_id={uuid}&status=published&limit=20&offset=0
-```
-
-## Metric snapshots
-
-| Method | Path | Purpose |
-| --- | --- | --- |
 | `POST` | `/api/videos/{video_id}/metrics` | Append a metric snapshot |
 | `GET` | `/api/videos/{video_id}/metrics` | Read metric history |
 
-Create request:
+Video statuses are `draft`, `scheduled`, `published`, and `failed`.
+`platform_video_id` is nullable. Any `published_at` must have a timezone.
+Video filters are `channel_id`, `status`, `limit`, and `offset`.
 
-```json
-{
-  "captured_at": "2026-07-28T12:00:00+00:00",
-  "views": 1250,
-  "likes": 110,
-  "comments": 12,
-  "shares": 8,
-  "watch_time_seconds": 48000,
-  "average_view_duration_seconds": 38,
-  "impressions": 9000,
-  "click_through_rate": "0.0750"
-}
-```
+Metric counts must be non-negative. `click_through_rate` is a decimal ratio from
+`0` through `1`. History supports `order=newest` or `order=oldest`.
 
-All count and duration fields must be non-negative. Click-through rate uses a
-decimal ratio from `0` through `1`; `0.0750` means 7.5%. Every POST creates a
-new historical row.
+## Errors
 
-History is newest-first by default:
+- `401`: missing, invalid, expired, revoked, or disabled-user session
+- `403`: CSRF failure, missing workspace membership, or insufficient role
+- `404`: resource absent from the active workspace
+- `409`: uniqueness conflict
+- `422`: invalid request data
+- `429`: login throttle active
 
-```text
-GET /api/videos/{video_id}/metrics?order=newest&limit=100&offset=0
-GET /api/videos/{video_id}/metrics?order=oldest&limit=100&offset=0
-```
-
-## Pagination and errors
-
-`limit` must be between 1 and 100. `offset` must be zero or greater. Results use
-stable timestamp-and-UUID ordering.
-
-Missing records return:
-
-```json
-{"detail": "Channel not found"}
-```
-
-Uniqueness conflicts return HTTP `409` with a safe explanation. Pydantic input
-validation returns HTTP `422`. Raw database exceptions are never returned.
-
-## Local commands
-
-Apply migrations:
-
-```powershell
-.\venv\Scripts\alembic.exe upgrade head
-```
-
-Run the API:
-
-```powershell
-.\venv\Scripts\uvicorn.exe main:app --reload
-```
-
-Run all tests:
-
-```powershell
-.\venv\Scripts\python.exe -m pytest -q
-```
+Raw database exceptions and credential-enumeration details are not returned.

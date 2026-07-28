@@ -9,12 +9,14 @@ The repository contains:
 
 - a FastAPI backend with synchronous SQLAlchemy, Psycopg 3, and Alembic;
 - local PostgreSQL 16 through Docker Compose;
-- channel, video, and metric APIs;
+- session-based authentication, CSRF protection, and workspace roles;
+- workspace-owned channel, video, and metric APIs;
 - a Next.js dashboard connected to the backend.
 
-CreatorOS is for local development only. It does not yet have authentication,
-authorization, rate limiting, or production secret management. Do not publish
-the application to the internet yet; see `SECURITY.md`.
+CreatorOS is for local development only. Authentication and record ownership are
+implemented, but production secret management, edge request limits, monitoring,
+and platform integrations are not. Do not publish the application to the
+internet yet; see `SECURITY.md`.
 
 ## Local setup
 

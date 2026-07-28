@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.errors import service_error_handler
 from app.api.router import api_router
 from app.core.config import get_settings
+from app.services.errors import ServiceError
 
 
 def create_application() -> FastAPI:
@@ -22,6 +24,7 @@ def create_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    application.add_exception_handler(ServiceError, service_error_handler)
 
     @application.get("/")
     def home() -> dict[str, str]:
