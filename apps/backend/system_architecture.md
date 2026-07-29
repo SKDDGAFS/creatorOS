@@ -219,6 +219,30 @@ API examples and the complete route list are documented in `API.md`.
 - PostgreSQL is the queue; Redis and Celery are not required at the current
   scale. Revision `0007` adds the job and attempt tables.
 
+## Platform adapter framework
+
+- `PlatformAdapter` is the provider-neutral protocol for account lifecycle,
+  channel/video/metric synchronization, publish validation, idempotent
+  publishing, status polling, and revocation.
+- DTOs use strict Pydantic models. Credentials are `SecretStr` values and metric
+  snapshots distinguish unavailable fields from reported zeros.
+- `CredentialStore` is the only at-rest secret boundary. Connection rows contain
+  a reference returned by that store, never access tokens, refresh tokens,
+  authorization codes, client secrets, or PKCE verifiers.
+- `PlatformAdapterRegistry` permits one typed adapter per platform. Sprints H
+  through J supply the official YouTube, Instagram, and TikTok implementations.
+- `PlatformSyncCursor` persists opaque pagination state by connection and
+  resource type.
+- `PlatformOperation` binds a hashed idempotency key to a canonical request
+  fingerprint and provider resource ID, preventing silent key reuse.
+- `PlatformRequestLog` stores no query string or response body. Headers, request
+  bodies, and Pydantic models are recursively redacted before persistence.
+- Adapter errors classify authentication/expiry, rate limits, transient
+  failures, permanent failures, and unsupported capabilities for job retry
+  policy.
+- Revision `0008` adds workspace-owned connections, cursors, operations, and
+  redacted request logs with restrictive foreign keys.
+
 ## Repository hardening controls
 
 - Docker publishes the development PostgreSQL port on `127.0.0.1` only. The

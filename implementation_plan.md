@@ -358,3 +358,31 @@ users inactive because they do not have passwords.
 - Review migration `0007` SQL before applying it to local PostgreSQL.
 - Test scheduling, priority, retries, maximum attempts, concurrency ownership,
   stale recovery, cancellation, idempotency, authorization, and the runner.
+
+# Sprint G implementation plan: platform adapter framework
+
+## Scope
+
+1. Define one typed adapter protocol for account connection, credential refresh,
+   disconnection, channel/video/metric synchronization, publish validation,
+   publishing, status polling, and revocation.
+2. Add provider-neutral DTOs for credentials, pagination, remote resources,
+   unavailable metrics, publish requests, and publish results.
+3. Add classified adapter errors for authentication, expiry, rate limits,
+   transient failures, permanent failures, and unsupported capabilities.
+4. Persist workspace-owned connection metadata, sync cursors, idempotent
+   operations, and redacted request logs without storing access or refresh tokens.
+5. Define a credential-store boundary and adapter registry; concrete encrypted
+   storage and official provider implementations remain provider-sprint work.
+6. Add recursive request redaction that drops URL queries and masks credential,
+   cookie, token, authorization, secret, and API-key fields.
+
+## Safety and verification
+
+- SQL rows contain a credential reference only, never credential material.
+- Request logs never store response bodies, query strings, or raw secrets.
+- Idempotency keys are hashed and bound to a canonical request fingerprint.
+- All connection and operation access is workspace scoped.
+- Review migration `0008` before applying it to local PostgreSQL.
+- Add contract, registry, redaction, cursor, idempotency, authorization, and
+  constraint tests using fake adapters and credential stores only.

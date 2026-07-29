@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.durable_job import DurableJob
     from app.models.growth_signal import GrowthSignalProfile
     from app.models.password_reset_token import PasswordResetToken
+    from app.models.platform_integration import PlatformConnection
     from app.models.publishing import PublishingJob
     from app.models.workspace import WorkspaceMembership
 
@@ -76,6 +77,11 @@ class User(Base):
         passive_deletes=True,
     )
     durable_jobs_created: Mapped[list[DurableJob]] = relationship(
+        back_populates="created_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    platform_connections_created: Mapped[list[PlatformConnection]] = relationship(
         back_populates="created_by",
         cascade="save-update, merge",
         passive_deletes=True,

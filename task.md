@@ -72,3 +72,17 @@
 - [x] Update API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open stacked draft pull request #7.
+
+## Sprint G: Platform adapter framework
+
+- [x] Add the complete typed platform adapter protocol.
+- [x] Add provider-neutral DTOs and classified adapter errors.
+- [x] Add a credential-store boundary that keeps tokens out of SQL.
+- [x] Add workspace-owned connection metadata and cursor persistence.
+- [x] Add idempotent platform-operation records.
+- [x] Add redacted provider request logging.
+- [x] Add adapter registry and fake-adapter contract tests.
+- [x] Add and review migration `0008`.
+- [x] Update architecture, API, security, and setup documentation.
+- [x] Run quality, migration, dependency, and secret checks.
+- [x] Commit, push, and open stacked draft pull request #8.

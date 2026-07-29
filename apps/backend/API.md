@@ -239,6 +239,36 @@ The typed handler registry executes one claimed job at a time and cannot run
 shell commands. Platform and publishing workers will register domain-specific
 handlers in later sprints.
 
+## Platform adapter framework
+
+The adapter framework is an internal service boundary in this sprint; it does
+not expose OAuth or connection-write routes until concrete official providers
+are implemented.
+
+Every adapter implements typed methods for:
+
+- connecting, refreshing, disconnecting, and revoking an account;
+- listing and synchronizing channels and videos;
+- synchronizing metric pages with explicit unavailable fields;
+- validating approved publish requests;
+- idempotent publishing and publish-status polling.
+
+Credentials use Pydantic `SecretStr` values in memory and a `CredentialStore`
+protocol at rest. PostgreSQL stores only a credential reference, safe account
+metadata, scopes, and expiry. No access token, refresh token, authorization code,
+client secret, or OAuth verifier belongs in a model or API response.
+
+Provider pages carry opaque next cursors, which are persisted per connection and
+resource type. Platform operations hash both the idempotency key and a canonical
+request fingerprint, so a repeated key can return the original operation but
+cannot silently represent another request.
+
+Request logs retain only method, hostname, path, status, duration, outcome, safe
+provider request ID, and recursively redacted structured metadata. URL query
+strings and response bodies are never stored. Adapter errors distinguish
+authentication, expiry, rate limiting, transient failure, permanent failure,
+and unsupported capability.
+
 ## Errors
 
 - `401`: missing, invalid, expired, revoked, or disabled-user session
