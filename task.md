@@ -71,4 +71,4 @@
 - [x] Add queue, retry, locking, runner, and authorization tests.
 - [x] Update API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open a stacked draft Sprint F pull request.
+- [x] Commit, push, and open stacked draft pull request #7.
