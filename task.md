@@ -29,7 +29,7 @@
 - [x] Add and review migration `0004`.
 - [x] Add analytics service, API, constraint, and authorization tests.
 - [x] Update analytics API and architecture documentation.
-- [x] Run quality, migration, dependency, and secret checks.
+- [ ] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open draft pull request #4.
 
 ## Sprint D: Growth-signal configuration
@@ -100,5 +100,6 @@
 - [x] Add adapter contract, OAuth, mapping, pagination, and publishing tests.
 - [x] Add and review migration `0009`.
 - [x] Add Google Cloud/OAuth setup and limitation documentation.
-- [ ] Run quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open a stacked draft Sprint H pull request.
+- [x] Run quality, migration, and secret checks; document unchanged-dependency
+  audit carry-forward.
+- [x] Commit, push, and open stacked draft pull request #9.
