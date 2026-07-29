@@ -62,3 +62,15 @@
 - [x] Add authorized profile, catalog, scoring, and deactivation APIs.
 - [x] Review and apply migration `0005` to local PostgreSQL.
 - [x] Add scoring, validation, isolation, lifecycle, and constraint tests.
+
+# Publishing workflow checklist
+
+- [x] Add workspace-owned publishing jobs and hashed idempotency keys.
+- [x] Add centralized publishing state transitions.
+- [x] Add human approval, scheduling, cancellation, failure, and retry rules.
+- [x] Add immutable transition and workspace activity records.
+- [x] Add authorized publishing and approval routes.
+- [x] Keep worker transitions internal and avoid external platform calls.
+- [x] Review and apply migration `0006` to local PostgreSQL.
+- [x] Add state-machine, idempotency, authorization, and lifecycle tests.
+- [x] Document workflow semantics and API endpoints.

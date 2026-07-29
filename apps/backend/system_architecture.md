@@ -173,6 +173,27 @@ and platform extensions with named checks and restrictive foreign keys.
 
 API examples and the complete route list are documented in `API.md`.
 
+## Publishing workflow
+
+- `PublishingJob` is workspace-owned, linked to a workspace-visible video, and
+  created with a hashed idempotency key.
+- `publishing_service.ALLOWED_TRANSITIONS` is the single state graph. HTTP routes
+  expose named actions instead of a general status update.
+- `ApprovalRequest` records each review round and the requesting and deciding
+  users. Only workspace owners and administrators can approve or reject.
+- A job cannot be scheduled or enter worker publishing without an approved human
+  decision.
+- `PublishingTransition` is immutable workflow history. `ActivityEvent` supplies
+  the workspace activity feed with safe structured metadata.
+- State, approval, transition, and activity writes commit atomically. Errors roll
+  back the entire action.
+- Rejected and failed jobs may retry through preparation. Published and cancelled
+  jobs are terminal.
+- Worker-only service methods can record start, safe failure, and confirmed
+  success. No route or service in this sprint contacts an external platform.
+- Revision `0006` adds the publishing, approval, transition, and activity tables
+  with restrictive foreign keys.
+
 ## Repository hardening controls
 
 - Docker publishes the development PostgreSQL port on `127.0.0.1` only. The

@@ -44,3 +44,17 @@
 - [x] Update API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open draft pull request #5.
+
+## Sprint E: Publishing workflow
+
+- [x] Add publishing jobs, approvals, transitions, and activity events.
+- [x] Add centralized state-machine rules.
+- [x] Require approval before scheduling/publishing.
+- [x] Add idempotent creation, scheduling, cancellation, failure, and retry.
+- [x] Keep multi-record workflow actions transactional.
+- [x] Add authorized workflow and activity APIs.
+- [x] Add and review migration `0006`.
+- [x] Add state-machine, idempotency, authorization, and constraint tests.
+- [x] Update API and architecture documentation.
+- [x] Run quality, migration, dependency, and secret checks.
+- [x] Commit, push, and open draft pull request #6.

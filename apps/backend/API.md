@@ -178,6 +178,39 @@ optional source confidence. The response reports:
 Missing observations reduce coverage rather than being treated as zero. Samples
 below a signal's configured minimum contribute zero confidence.
 
+## Publishing workflow
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/publishing/jobs` | Create an idempotent publishing job |
+| `GET` | `/api/publishing/jobs` | List or filter workspace jobs |
+| `GET` | `/api/publishing/jobs/{id}` | Read one job and its audit history |
+| `POST` | `/api/publishing/jobs/{id}/prepare` | Begin preparation or retry |
+| `POST` | `/api/publishing/jobs/{id}/request-approval` | Request human approval |
+| `GET` | `/api/publishing/approvals` | List pending approvals |
+| `POST` | `/api/publishing/approvals/{id}/approve` | Approve as owner/admin |
+| `POST` | `/api/publishing/approvals/{id}/reject` | Reject as owner/admin |
+| `POST` | `/api/publishing/jobs/{id}/schedule` | Schedule approved content |
+| `POST` | `/api/publishing/jobs/{id}/cancel` | Cancel a nonterminal job |
+| `GET` | `/api/publishing/activity` | Read workspace activity |
+
+Create requests require an opaque `Idempotency-Key` header containing 8 through
+128 characters. Repeating a key with the same video returns the original job;
+reusing it for another video returns `409`. Only a SHA-256 hash of the key is
+stored.
+
+The centralized state graph supports `draft`, `preparing`,
+`awaiting_approval`, `approved`, `scheduled`, `publishing`, `published`,
+`rejected`, `failed`, and `cancelled`. Routes never accept an arbitrary state.
+Approval decisions require an owner or administrator. Scheduling and worker-side
+publishing require a recorded human approval.
+
+Every transition writes immutable transition and activity records in the same
+database transaction as the state change. Rejected and failed jobs can return to
+preparation; published and cancelled jobs are terminal. The worker-only service
+methods record publishing, success, and safe failure state but do not call a
+social platform.
+
 ## Errors
 
 - `401`: missing, invalid, expired, revoked, or disabled-user session
