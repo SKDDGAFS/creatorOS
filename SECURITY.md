@@ -25,6 +25,15 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - If a secret is exposed, revoke or rotate it first, then remove it from code and
   history. Deleting the visible file is not sufficient.
 - Review dependency audit results before merging dependency changes.
+- Platform credentials exist in memory only as redacted `SecretStr` values and
+  must be stored through an encrypted `CredentialStore` implementation.
+  PostgreSQL connection records contain only a vault reference.
+- Provider request logs discard URL queries and response bodies and recursively
+  redact authorization, cookie, token, password, secret, credential, OAuth
+  verifier, and API-key fields.
+- Do not enable a real OAuth flow until the provider sprint supplies encrypted
+  credential storage, minimum scopes, callback state validation, revocation, and
+  provider-specific setup review.
 
 ## Required controls before public deployment
 

@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from app.models.channel import Channel
     from app.models.durable_job import DurableJob
     from app.models.growth_signal import GrowthSignalProfile
+    from app.models.platform_integration import PlatformConnection
     from app.models.publishing import ActivityEvent, PublishingJob
     from app.models.user import User
 
@@ -73,6 +74,11 @@ class Workspace(Base):
         passive_deletes=True,
     )
     durable_jobs: Mapped[list[DurableJob]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    platform_connections: Mapped[list[PlatformConnection]] = relationship(
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,

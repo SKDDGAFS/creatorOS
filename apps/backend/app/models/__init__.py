@@ -24,6 +24,15 @@ from app.models.growth_signal import (
     SignalTier,
 )
 from app.models.password_reset_token import PasswordResetToken
+from app.models.platform_integration import (
+    ConnectionStatus,
+    PlatformConnection,
+    PlatformOperation,
+    PlatformOperationStatus,
+    PlatformRequestLog,
+    PlatformSyncCursor,
+    RequestOutcome,
+)
 from app.models.publishing import (
     ActivityEvent,
     ActivityType,
@@ -46,6 +55,7 @@ __all__ = [
     "ApprovalRequest",
     "ApprovalStatus",
     "Channel",
+    "ConnectionStatus",
     "DurableJob",
     "GrowthSignal",
     "GrowthSignalProfile",
@@ -56,9 +66,15 @@ __all__ = [
     "JobStatus",
     "PasswordResetToken",
     "Platform",
+    "PlatformConnection",
+    "PlatformOperation",
+    "PlatformOperationStatus",
+    "PlatformRequestLog",
+    "PlatformSyncCursor",
     "PublishingJob",
     "PublishingState",
     "PublishingTransition",
+    "RequestOutcome",
     "SignalTier",
     "TikTokMetricExtension",
     "User",

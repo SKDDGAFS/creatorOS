@@ -86,3 +86,15 @@
 - [x] Review and apply migration `0007` to local PostgreSQL.
 - [x] Add queue, locking, retry, runner, and authorization tests.
 - [x] Document queue semantics and operational boundaries.
+
+# Platform adapter framework checklist
+
+- [x] Add typed account, sync, metrics, publish, status, and revoke contracts.
+- [x] Add classified provider errors and adapter registry.
+- [x] Add an encrypted credential-store protocol and keep tokens out of SQL.
+- [x] Add workspace-owned connection metadata and sync cursors.
+- [x] Add fingerprint-bound idempotent operation records.
+- [x] Add recursively redacted request logging without queries or responses.
+- [x] Review and apply migration `0008` to local PostgreSQL.
+- [x] Add fake adapter, credential, redaction, cursor, and operation tests.
+- [x] Document security and external-provider boundaries.

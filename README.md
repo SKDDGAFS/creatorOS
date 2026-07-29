@@ -15,6 +15,8 @@ The repository contains:
   external platforms;
 - a PostgreSQL-backed durable job queue with retries, leases, and attempt
   history;
+- a typed platform-adapter framework with credential-store isolation, cursors,
+  idempotency, and redacted request logs;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -59,6 +61,9 @@ npm run dev
 
 Open `http://localhost:3000`. The API documentation is at
 `http://127.0.0.1:8000/docs`.
+
+Real YouTube, Instagram, and TikTok OAuth credentials are not configured at this
+stage. The adapter framework uses fakes in tests and performs no platform calls.
 
 ## Verification
 
