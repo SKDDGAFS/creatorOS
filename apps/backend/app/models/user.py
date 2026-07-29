@@ -10,6 +10,7 @@ from app.db.base import Base, utc_now
 if TYPE_CHECKING:
     from app.models.auth_session import AuthSession
     from app.models.channel import Channel
+    from app.models.durable_job import DurableJob
     from app.models.growth_signal import GrowthSignalProfile
     from app.models.password_reset_token import PasswordResetToken
     from app.models.publishing import PublishingJob
@@ -70,6 +71,11 @@ class User(Base):
         passive_deletes=True,
     )
     publishing_jobs_created: Mapped[list[PublishingJob]] = relationship(
+        back_populates="created_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    durable_jobs_created: Mapped[list[DurableJob]] = relationship(
         back_populates="created_by",
         cascade="save-update, merge",
         passive_deletes=True,

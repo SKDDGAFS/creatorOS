@@ -11,6 +11,12 @@ from app.models.analytics import (
 from app.models.auth_session import AuthSession
 from app.models.auth_throttle import AuthThrottle
 from app.models.channel import Channel, Platform
+from app.models.durable_job import (
+    DurableJob,
+    JobAttempt,
+    JobAttemptStatus,
+    JobStatus,
+)
 from app.models.growth_signal import (
     GrowthSignal,
     GrowthSignalProfile,
@@ -40,10 +46,14 @@ __all__ = [
     "ApprovalRequest",
     "ApprovalStatus",
     "Channel",
+    "DurableJob",
     "GrowthSignal",
     "GrowthSignalProfile",
     "GrowthSignalWeight",
     "InstagramMetricExtension",
+    "JobAttempt",
+    "JobAttemptStatus",
+    "JobStatus",
     "PasswordResetToken",
     "Platform",
     "PublishingJob",

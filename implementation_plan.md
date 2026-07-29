@@ -333,3 +333,28 @@ users inactive because they do not have passwords.
   and adapter sprints.
 - Published content cannot be deleted through this workflow.
 - Review migration `0006` SQL before local application.
+
+# Sprint F implementation plan: durable job system
+
+## Scope
+
+1. Add workspace-owned durable jobs and immutable per-attempt history.
+2. Store typed payloads, priority, schedule, attempt limits, leases, safe errors,
+   results, and lifecycle timestamps in PostgreSQL.
+3. Claim eligible work with row locking and `SKIP LOCKED`; never hold a database
+   transaction open while a handler runs.
+4. Add exponential retry backoff, heartbeat-based lease extension, stale-lock
+   recovery, cancellation, and idempotent enqueueing.
+5. Add a typed in-process handler registry and single-job runner without shell
+   execution or an additional infrastructure dependency.
+6. Expose workspace-scoped job observability and administrator cancellation, but
+   do not expose generic job enqueueing to HTTP clients.
+
+## Safety and verification
+
+- Payloads must be JSON objects and must never contain credentials or secrets.
+- Lock ownership is verified before completion, failure, or heartbeat.
+- Terminal jobs cannot be mutated, and cancellation invalidates active leases.
+- Review migration `0007` SQL before applying it to local PostgreSQL.
+- Test scheduling, priority, retries, maximum attempts, concurrency ownership,
+  stale recovery, cancellation, idempotency, authorization, and the runner.
