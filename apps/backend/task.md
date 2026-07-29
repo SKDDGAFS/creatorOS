@@ -52,3 +52,13 @@
 - [x] Compute safe derived rates without persisting stale values.
 - [x] Review and apply migration `0004` to local PostgreSQL.
 - [x] Add analytics service, validation, authorization, and constraint tests.
+
+# Growth-signal configuration checklist
+
+- [x] Add contextual, workspace-owned, immutable profile versions.
+- [x] Add configurable weights and advisory predictor tiers.
+- [x] Add sample-size, evidence-volume, and source-confidence handling.
+- [x] Return deterministic score, confidence, coverage, and contributions.
+- [x] Add authorized profile, catalog, scoring, and deactivation APIs.
+- [x] Review and apply migration `0005` to local PostgreSQL.
+- [x] Add scoring, validation, isolation, lifecycle, and constraint tests.

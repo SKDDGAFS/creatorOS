@@ -10,6 +10,7 @@ from app.db.base import Base, utc_now
 if TYPE_CHECKING:
     from app.models.auth_session import AuthSession
     from app.models.channel import Channel
+    from app.models.growth_signal import GrowthSignalProfile
     from app.models.password_reset_token import PasswordResetToken
     from app.models.workspace import WorkspaceMembership
 
@@ -59,6 +60,11 @@ class User(Base):
     )
     password_reset_tokens: Mapped[list[PasswordResetToken]] = relationship(
         back_populates="user",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    growth_signal_profiles_created: Mapped[list[GrowthSignalProfile]] = relationship(
+        back_populates="created_by",
         cascade="save-update, merge",
         passive_deletes=True,
     )

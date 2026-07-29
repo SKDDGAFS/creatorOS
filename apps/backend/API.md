@@ -146,6 +146,38 @@ viewer, impressions-to-view, average-percentage-viewed, and completion rates.
 A derived rate is `null` when required inputs or a nonzero denominator are
 unavailable. Derived values are not persisted, so they cannot become stale.
 
+## Growth-signal profiles
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/growth-signals/catalog` | Read the advisory signal catalog |
+| `POST` | `/api/growth-signals/profiles` | Create an immutable profile version |
+| `GET` | `/api/growth-signals/profiles` | List active workspace profiles |
+| `GET` | `/api/growth-signals/profiles/{id}` | Read one profile |
+| `POST` | `/api/growth-signals/profiles/{id}/score` | Score normalized evidence |
+| `POST` | `/api/growth-signals/profiles/{id}/deactivate` | Retire a profile |
+
+Profiles scope configurable weights by platform, content format, account-size
+range, video-duration range, goal, and evidence-volume range. Creating the same
+profile name again creates a new version rather than changing historical
+configuration.
+
+Each weight stores a descriptive tier, positive configured weight, minimum sample
+size, and full-confidence sample size. Suggested `strong`, `medium`, and
+`contextual` tiers are guidance only; they do not assign a permanent weight.
+
+Scoring accepts normalized values from zero through one, sample sizes, and
+optional source confidence. The response reports:
+
+- score: weighted value after confidence adjustment;
+- confidence: weight-adjusted evidence confidence;
+- coverage: the fraction of configured weight with an observation;
+- per-signal contributions;
+- an explicitly correlational interpretation.
+
+Missing observations reduce coverage rather than being treated as zero. Samples
+below a signal's configured minimum contribute zero confidence.
+
 ## Errors
 
 - `401`: missing, invalid, expired, revoked, or disabled-user session

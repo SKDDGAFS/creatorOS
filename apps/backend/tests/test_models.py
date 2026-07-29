@@ -5,6 +5,8 @@ from app.models import (
     AuthSession,
     AuthThrottle,
     Channel,
+    GrowthSignalProfile,
+    GrowthSignalWeight,
     InstagramMetricExtension,
     PasswordResetToken,
     TikTokMetricExtension,
@@ -45,6 +47,8 @@ def test_all_domain_tables_are_registered() -> None:
         "tiktok_metric_extensions",
         "instagram_metric_extensions",
         "youtube_metric_extensions",
+        "growth_signal_profiles",
+        "growth_signal_weights",
     } <= set(Base.metadata.tables)
 
 
@@ -59,6 +63,8 @@ def test_models_use_uuid_primary_keys() -> None:
         Channel,
         Video,
         VideoMetric,
+        GrowthSignalProfile,
+        GrowthSignalWeight,
     ):
         id_column = model.__table__.c.id
         assert id_column.primary_key
@@ -200,6 +206,26 @@ def test_platform_extensions_are_one_to_one_with_metric() -> None:
         assert isinstance(metric_id.type, Uuid)
 
 
+def test_growth_signal_profiles_have_context_and_confidence_constraints() -> None:
+    profile_checks = constraint_names(GrowthSignalProfile)
+    weight_checks = constraint_names(GrowthSignalWeight)
+
+    assert {
+        "ck_growth_signal_profiles_platform_allowed",
+        "ck_growth_signal_profiles_account_size_range",
+        "ck_growth_signal_profiles_video_duration_range",
+        "ck_growth_signal_profiles_evidence_range",
+        "uq_growth_signal_profiles_workspace_name_version",
+    } <= profile_checks
+    assert {
+        "ck_growth_signal_weights_signal_allowed",
+        "ck_growth_signal_weights_tier_allowed",
+        "ck_growth_signal_weights_weight_range",
+        "ck_growth_signal_weights_confidence_sample_range",
+        "uq_growth_signal_weights_profile_signal",
+    } <= weight_checks
+
+
 def test_foreign_keys_are_restrictive() -> None:
     for column in (
         WorkspaceMembership.__table__.c.workspace_id,
@@ -218,6 +244,9 @@ def test_foreign_keys_are_restrictive() -> None:
         TikTokMetricExtension.__table__.c.video_metric_id,
         InstagramMetricExtension.__table__.c.video_metric_id,
         YouTubeMetricExtension.__table__.c.video_metric_id,
+        GrowthSignalProfile.__table__.c.workspace_id,
+        GrowthSignalProfile.__table__.c.created_by_user_id,
+        GrowthSignalWeight.__table__.c.profile_id,
     ):
         foreign_key = next(iter(column.foreign_keys))
         assert foreign_key.ondelete == "RESTRICT"
@@ -233,6 +262,9 @@ def test_relationships_do_not_delete_related_records() -> None:
         VideoMetric.demographics,
         VideoMetric.geography,
         VideoMetric.discovery_assets,
+        Workspace.growth_signal_profiles,
+        User.growth_signal_profiles_created,
+        GrowthSignalProfile.weights,
     )
 
     for relationship in relationships:
