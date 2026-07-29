@@ -85,4 +85,4 @@
 - [x] Add and review migration `0008`.
 - [x] Update architecture, API, security, and setup documentation.
 - [x] Run quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open a stacked draft Sprint G pull request.
+- [x] Commit, push, and open stacked draft pull request #8.
