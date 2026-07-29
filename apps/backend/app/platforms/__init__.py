@@ -12,7 +12,13 @@ from app.platforms.contracts import (
     RemoteMetricSnapshot,
     RemoteVideo,
 )
-from app.platforms.credentials import CredentialStore
+from app.platforms.credentials import (
+    CredentialStore,
+    InMemoryPlatformSecretStore,
+    OAuthSecretStore,
+    OAuthVerifierMaterial,
+    PlatformSecretStore,
+)
 from app.platforms.errors import (
     PlatformAdapterError,
     PlatformAuthenticationError,
@@ -30,6 +36,10 @@ __all__ = [
     "ConnectedAccount",
     "CredentialMaterial",
     "CredentialStore",
+    "InMemoryPlatformSecretStore",
+    "OAuthSecretStore",
+    "OAuthVerifierMaterial",
+    "PlatformSecretStore",
     "PlatformAdapter",
     "PlatformAdapterError",
     "PlatformAdapterRegistry",

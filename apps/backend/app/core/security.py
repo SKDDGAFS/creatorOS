@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import hmac
 import secrets
@@ -31,3 +32,12 @@ def hash_token(token: str) -> str:
 
 def tokens_match(left: str, right: str) -> bool:
     return hmac.compare_digest(left, right)
+
+
+def generate_pkce_verifier() -> str:
+    return secrets.token_urlsafe(64)
+
+
+def pkce_s256_challenge(verifier: str) -> str:
+    digest = hashlib.sha256(verifier.encode("ascii")).digest()
+    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")

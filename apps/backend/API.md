@@ -241,9 +241,8 @@ handlers in later sprints.
 
 ## Platform adapter framework
 
-The adapter framework is an internal service boundary in this sprint; it does
-not expose OAuth or connection-write routes until concrete official providers
-are implemented.
+The adapter framework is the internal provider boundary. YouTube is the first
+concrete provider; Instagram and TikTok remain unconfigured.
 
 Every adapter implements typed methods for:
 
@@ -268,6 +267,41 @@ provider request ID, and recursively redacted structured metadata. URL query
 strings and response bodies are never stored. Adapter errors distinguish
 authentication, expiry, rate limiting, transient failure, permanent failure,
 and unsupported capability.
+
+## YouTube integration
+
+All connection responses omit `credential_reference` and every token or code.
+Workspace reads require membership. OAuth start and disconnect require an owner
+or administrator plus CSRF. Synchronization requires workspace write access.
+The callback requires the signed-in user who created its single-use state; it
+does not trust a workspace header.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/integrations` | List safe connection metadata |
+| `POST` | `/api/integrations/youtube/oauth/start` | Create state/PKCE and return Google's authorization URL |
+| `GET` | `/api/integrations/youtube/oauth/callback` | Validate state, exchange the code, and connect/reconnect |
+| `GET` | `/api/integrations/youtube/{connection_id}` | Read one YouTube connection |
+| `POST` | `/api/integrations/youtube/{connection_id}/sync/channel` | Synchronize the authenticated channel |
+| `POST` | `/api/integrations/youtube/{connection_id}/sync/videos` | Synchronize one uploads-playlist page |
+| `POST` | `/api/integrations/youtube/{connection_id}/sync/videos/{video_id}/metrics` | Append a targeted Analytics snapshot |
+| `GET` | `/api/integrations/youtube/{connection_id}/quota` | Read daily quota/accounting buckets |
+| `DELETE` | `/api/integrations/youtube/{connection_id}` | Revoke and disconnect |
+
+OAuth start accepts `{"publishing": false}`. Setting it to `true` is rejected
+unless backend configuration explicitly enables the upload scope. Even then,
+the runtime media source remains disabled until safe media storage is
+implemented.
+
+Video synchronization returns the synchronized page and `next_cursor`.
+Subsequent calls resume through the persisted opaque cursor. Metric
+synchronization preserves unavailable values as null and allows YouTube
+retention ratios above `1` when rewatches cause them.
+
+Provider rate limits return `429`; expired/revoked provider credentials mark the
+connection `reconnect_required` and return `409`. Provider bodies and tokens are
+never returned. See `../../docs/YOUTUBE_SETUP.md` for setup, supported metrics,
+provider limitations, and rollback.
 
 ## Errors
 

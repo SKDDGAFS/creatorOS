@@ -86,3 +86,19 @@
 - [x] Update architecture, API, security, and setup documentation.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open stacked draft pull request #8.
+
+## Sprint H: YouTube integration
+
+- [x] Add secure YouTube OAuth state, PKCE, callback, and refresh foundations.
+- [x] Request minimum incremental OAuth scopes.
+- [x] Add authenticated channel and uploads-playlist synchronization.
+- [x] Add paginated video synchronization and status mapping.
+- [x] Add Analytics activity, retention, traffic, and subscriber mapping.
+- [x] Add upload validation, dispatch, scheduling, and status polling.
+- [x] Add quota tracking and classified Google errors.
+- [x] Add disconnect, credential deletion, and token revocation.
+- [x] Add adapter contract, OAuth, mapping, pagination, and publishing tests.
+- [x] Add and review migration `0009`.
+- [x] Add Google Cloud/OAuth setup and limitation documentation.
+- [ ] Run quality, migration, dependency, and secret checks.
+- [ ] Commit, push, and open a stacked draft Sprint H pull request.

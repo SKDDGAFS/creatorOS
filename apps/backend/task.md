@@ -98,3 +98,18 @@
 - [x] Review and apply migration `0008` to local PostgreSQL.
 - [x] Add fake adapter, credential, redaction, cursor, and operation tests.
 - [x] Document security and external-provider boundaries.
+
+# YouTube integration checklist
+
+- [x] Add state-hashed, PKCE-protected, user-bound OAuth authorization.
+- [x] Add minimum/incremental read, analytics, and optional upload scopes.
+- [x] Add token exchange, refresh, revocation, and safe error classification.
+- [x] Add channel, uploads-playlist, video, and opaque-cursor synchronization.
+- [x] Add activity, retention, traffic-source, and subscriber analytics mapping.
+- [x] Preserve rewatch retention ratios above one and unavailable metric nulls.
+- [x] Add upload validation, resumable dispatch, and status polling boundaries.
+- [x] Add daily quota accounting and redacted request telemetry.
+- [x] Add authorized integration routes and safe response schemas.
+- [x] Review and apply migration `0009` to local PostgreSQL.
+- [x] Add mocked OAuth, transport, sync, publishing, quota, and route tests.
+- [x] Document Google setup, provider limitations, and rollback.

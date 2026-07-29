@@ -17,12 +17,15 @@ The repository contains:
   history;
 - a typed platform-adapter framework with credential-store isolation, cursors,
   idempotency, and redacted request logs;
+- a credential-independent YouTube integration with secure OAuth state/PKCE,
+  channel and video synchronization, analytics mappings, quota telemetry,
+  upload validation, and mocked adapter tests;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
 implemented, but production secret management, edge request limits, monitoring,
-and platform integrations are not. Do not publish the application to the
-internet yet; see `SECURITY.md`.
+and production-ready platform credentials are not. Do not publish the
+application to the internet yet; see `SECURITY.md`.
 
 ## Local setup
 
@@ -62,8 +65,10 @@ npm run dev
 Open `http://localhost:3000`. The API documentation is at
 `http://127.0.0.1:8000/docs`.
 
-Real YouTube, Instagram, and TikTok OAuth credentials are not configured at this
-stage. The adapter framework uses fakes in tests and performs no platform calls.
+Real YouTube, Instagram, and TikTok credentials are not committed or used by
+tests. YouTube's code and exact manual setup are documented in
+`docs/YOUTUBE_SETUP.md`; the included secret store is local/test only and real
+publishing remains disabled.
 
 ## Verification
 

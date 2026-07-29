@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     JSON,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -287,4 +288,81 @@ class PlatformRequestLog(Base):
     )
     operation: Mapped[PlatformOperation | None] = relationship(
         back_populates="request_logs"
+    )
+
+
+class OAuthAuthorizationState(Base):
+    __tablename__ = "oauth_authorization_states"
+    __table_args__ = (
+        CheckConstraint(
+            "platform IN ('youtube', 'tiktok', 'instagram')",
+            name="platform_allowed",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="RESTRICT"),
+        index=True,
+    )
+    created_by_user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        index=True,
+    )
+    platform: Mapped[str] = mapped_column(String(20), index=True)
+    state_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    secret_reference: Mapped[str] = mapped_column(String(500))
+    requested_scopes: Mapped[list[str]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"),
+    )
+    redirect_uri: Mapped[str] = mapped_column(String(2000))
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        index=True,
+    )
+    consumed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        server_default=func.now(),
+    )
+
+
+class PlatformQuotaUsage(Base):
+    __tablename__ = "platform_quota_usage"
+    __table_args__ = (
+        CheckConstraint("units >= 0", name="units_nonnegative"),
+        CheckConstraint(
+            "request_count >= 0",
+            name="request_count_nonnegative",
+        ),
+        UniqueConstraint(
+            "connection_id",
+            "usage_date",
+            "quota_bucket",
+            name="uq_platform_quota_usage_connection_date_bucket",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    connection_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("platform_connections.id", ondelete="RESTRICT"),
+        index=True,
+    )
+    usage_date: Mapped[date] = mapped_column(Date)
+    quota_bucket: Mapped[str] = mapped_column(String(100))
+    units: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    request_count: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        server_default=func.now(),
+        onupdate=utc_now,
     )

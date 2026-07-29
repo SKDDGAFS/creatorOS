@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 from uuid import UUID
 
@@ -15,6 +15,7 @@ from app.models.platform_integration import (
     PlatformConnection,
     PlatformOperation,
     PlatformOperationStatus,
+    PlatformQuotaUsage,
     PlatformRequestLog,
     PlatformSyncCursor,
     RequestOutcome,
@@ -483,3 +484,101 @@ def record_request_log(
     _commit(db, "Unable to record platform request log")
     db.refresh(log)
     return log
+
+
+def record_quota_usage(
+    db: Session,
+    *,
+    workspace_id: UUID,
+    connection_id: UUID,
+    quota_bucket: str,
+    units: int,
+    request_count: int = 1,
+    usage_date: date | None = None,
+) -> PlatformQuotaUsage:
+    bucket = _normalize_identifier(quota_bucket, "quota_bucket")
+    if units < 0:
+        raise InvalidRequestError("units cannot be negative")
+    if request_count < 1:
+        raise InvalidRequestError("request_count must be positive")
+    get_connection(
+        db,
+        workspace_id=workspace_id,
+        connection_id=connection_id,
+    )
+    day = usage_date or _utc_now().date()
+    statement = (
+        select(PlatformQuotaUsage)
+        .where(
+            PlatformQuotaUsage.connection_id == connection_id,
+            PlatformQuotaUsage.usage_date == day,
+            PlatformQuotaUsage.quota_bucket == bucket,
+        )
+        .with_for_update()
+    )
+    record = db.scalar(statement)
+    if record is None:
+        record = PlatformQuotaUsage(
+            connection_id=connection_id,
+            usage_date=day,
+            quota_bucket=bucket,
+            units=units,
+            request_count=request_count,
+        )
+        db.add(record)
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            record = db.scalar(statement)
+            if record is None:
+                raise ConflictError(
+                    "Unable to record platform quota usage"
+                ) from None
+            record.units += units
+            record.request_count += request_count
+            _commit(db, "Unable to record platform quota usage")
+        except SQLAlchemyError as exc:
+            db.rollback()
+            raise PersistenceError(
+                "Unable to record platform quota usage"
+            ) from exc
+    else:
+        record.units += units
+        record.request_count += request_count
+        _commit(db, "Unable to record platform quota usage")
+    db.refresh(record)
+    return record
+
+
+def list_quota_usage(
+    db: Session,
+    *,
+    workspace_id: UUID,
+    connection_id: UUID,
+    start_date: date | None = None,
+    end_date: date | None = None,
+) -> list[PlatformQuotaUsage]:
+    if start_date is not None and end_date is not None and start_date > end_date:
+        raise InvalidRequestError("start_date cannot be after end_date")
+    get_connection(
+        db,
+        workspace_id=workspace_id,
+        connection_id=connection_id,
+    )
+    statement: Select[tuple[PlatformQuotaUsage]] = select(
+        PlatformQuotaUsage
+    ).where(PlatformQuotaUsage.connection_id == connection_id)
+    if start_date is not None:
+        statement = statement.where(
+            PlatformQuotaUsage.usage_date >= start_date
+        )
+    if end_date is not None:
+        statement = statement.where(
+            PlatformQuotaUsage.usage_date <= end_date
+        )
+    statement = statement.order_by(
+        PlatformQuotaUsage.usage_date,
+        PlatformQuotaUsage.quota_bucket,
+    )
+    return list(db.scalars(statement).all())
