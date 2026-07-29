@@ -386,3 +386,30 @@ users inactive because they do not have passwords.
 - Review migration `0008` before applying it to local PostgreSQL.
 - Add contract, registry, redaction, cursor, idempotency, authorization, and
   constraint tests using fake adapters and credential stores only.
+
+# Sprint H implementation plan: YouTube integration
+
+## Verified official boundaries
+
+1. Use the Google OAuth web-server authorization-code flow with a unique state,
+   PKCE, exact redirect URI, offline access, and incremental scopes.
+2. Default to `youtube.readonly` and `yt-analytics.readonly`; request
+   `youtube.upload` only when publishing is explicitly enabled.
+3. Discover the authenticated channel and uploads playlist through
+   `channels.list(mine=true)`, then paginate uploaded videos through
+   `playlistItems.list` and hydrate them with `videos.list`.
+4. Query targeted Analytics reports for activity, traffic sources, audience
+   retention, subscriber changes, and other officially exposed owner metrics.
+5. Upload through `videos.insert`, poll `videos.list` processing/status fields,
+   and schedule only private videos that have never been published.
+6. Track quota usage and classify Google error reasons without logging response
+   bodies or credential-bearing query strings.
+
+## Credential-independent delivery
+
+- Add configuration and secure OAuth-state foundations without real secrets.
+- Add a typed transport and media-source boundary with a fully mocked adapter.
+- Implement mappings, refresh/revocation, pagination, metrics, publishing
+  validation, upload dispatch, and status polling against fake transports.
+- Add exact Google Cloud/OAuth setup instructions and honest audit limitations.
+- Never contact Google or upload content in tests.

@@ -31,9 +31,15 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - Provider request logs discard URL queries and response bodies and recursively
   redact authorization, cookie, token, password, secret, credential, OAuth
   verifier, and API-key fields.
-- Do not enable a real OAuth flow until the provider sprint supplies encrypted
-  credential storage, minimum scopes, callback state validation, revocation, and
-  provider-specific setup review.
+- YouTube now supplies minimum scopes, a hashed single-use state, PKCE,
+  callback-user binding, refresh, and revocation. The included credential store
+  is volatile development/test memory only. Do not enable a production or
+  public OAuth flow until an encrypted external secret-store implementation is
+  configured and reviewed.
+- OAuth callback URLs must be exact. Production configuration rejects a
+  non-HTTPS YouTube redirect URI.
+- Provider telemetry stores no response body or URL query. OAuth token endpoint
+  form bodies and bearer headers are never passed to persistence.
 
 ## Required controls before public deployment
 

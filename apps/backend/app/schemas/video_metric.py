@@ -23,7 +23,6 @@ class RetentionPointCreate(AnalyticsSchema):
     position_ratio: Decimal = Field(ge=0, le=1, max_digits=7, decimal_places=6)
     audience_retention_ratio: Decimal = Field(
         ge=0,
-        le=1,
         max_digits=7,
         decimal_places=6,
     )

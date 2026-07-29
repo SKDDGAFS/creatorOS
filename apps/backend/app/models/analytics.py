@@ -28,7 +28,7 @@ class VideoRetentionPoint(Base):
             name="position_ratio",
         ),
         CheckConstraint(
-            "audience_retention_ratio >= 0 AND audience_retention_ratio <= 1",
+            "audience_retention_ratio >= 0",
             name="audience_retention_ratio",
         ),
         UniqueConstraint(

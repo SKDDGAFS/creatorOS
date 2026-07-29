@@ -243,6 +243,38 @@ API examples and the complete route list are documented in `API.md`.
 - Revision `0008` adds workspace-owned connections, cursors, operations, and
   redacted request logs with restrictive foreign keys.
 
+## YouTube integration
+
+- `platforms/youtube/oauth.py` creates random state and PKCE material. Only the
+  state hash and secret-store reference enter PostgreSQL. The state is bound to
+  one workspace/user, row-locked during callback, expires quickly, and is
+  consumed before a provider exchange.
+- `YouTubeHttpTransport` is the only Google HTTP boundary. It uses current
+  official REST endpoints, fixed HTTPS origins, bounded timeouts, bearer
+  headers, classified safe errors, quota callbacks, and query/body-free request
+  telemetry. Resumable upload locations are restricted to approved Google
+  hosts, preventing a provider response from becoming an SSRF primitive.
+- `YouTubeAdapter` maps provider resources into provider-neutral DTOs. It
+  discovers the uploads playlist, batches at most 50 video IDs, preserves
+  unavailable analytics, and separates validation from upload dispatch.
+- `youtube_service` owns credential refresh, connection/reconnection,
+  workspace-scoped local upserts, cursor persistence, append-only metric
+  snapshots, telemetry flushing, revocation, and credential deletion. Routes
+  contain authorization/dependency wiring only.
+- Access and refresh tokens remain behind `PlatformSecretStore`. The included
+  in-memory implementation is development/test only and production refuses it.
+- `OAuthAuthorizationState` and `PlatformQuotaUsage` were added by revision
+  `0009`. The same revision removes the incorrect upper bound on absolute
+  audience-retention ratio because YouTube documents valid rewatch values above
+  `1`.
+- Targeted Analytics queries provide activity, retention, traffic-source, and
+  subscribed-status data. The newer thumbnail reach reports belong to the bulk
+  Reporting API, so the targeted adapter leaves reported impressions CTR null
+  rather than inventing or mislabeling it.
+- Application publishing remains unavailable until the authorized media-store
+  boundary exists. The transport and adapter can be fully tested through an
+  injected media source without opening local paths or contacting Google.
+
 ## Repository hardening controls
 
 - Docker publishes the development PostgreSQL port on `127.0.0.1` only. The
