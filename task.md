@@ -120,4 +120,4 @@
 - [x] Add mocked OAuth, transport, adapter, service, and route tests.
 - [x] Document Meta setup, access review, official limitations, and rollback.
 - [x] Run quality, migration, and secret checks.
-- [ ] Commit, push, and open a stacked draft pull request without merging.
+- [x] Commit, push, and open stacked draft pull request #10 without merging.
