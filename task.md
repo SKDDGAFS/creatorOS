@@ -58,3 +58,17 @@
 - [x] Update API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open draft pull request #6.
+
+## Sprint F: Durable job system
+
+- [x] Add workspace-owned durable jobs and attempt history.
+- [x] Add scheduled, prioritized, idempotent enqueueing.
+- [x] Add atomic row-lock claiming and expiring worker leases.
+- [x] Add heartbeat, exponential retry, and stale-lock recovery.
+- [x] Add cancellation and workspace job observability.
+- [x] Add a typed handler registry and safe single-job runner.
+- [x] Add and review migration `0007`.
+- [x] Add queue, retry, locking, runner, and authorization tests.
+- [x] Update API and architecture documentation.
+- [x] Run quality, migration, dependency, and secret checks.
+- [x] Commit, push, and open stacked draft pull request #7.

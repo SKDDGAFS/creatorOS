@@ -211,6 +211,34 @@ preparation; published and cancelled jobs are terminal. The worker-only service
 methods record publishing, success, and safe failure state but do not call a
 social platform.
 
+## Durable jobs
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/jobs` | List/filter jobs in the active workspace |
+| `GET` | `/api/jobs/{id}` | Read one job and its attempt history |
+| `POST` | `/api/jobs/{id}/cancel` | Cancel as a workspace owner/admin |
+
+Generic enqueueing is intentionally not exposed over HTTP. Domain services add
+typed jobs internally, preventing clients from choosing arbitrary worker
+operations or payloads. Payloads must be JSON objects and must never contain
+credentials or secrets.
+
+Jobs support `pending`, `running`, `retry_scheduled`, `succeeded`, `failed`, and
+`cancelled` states. Priority ranges from 0 through 100. Eligible jobs are claimed
+in descending priority order with PostgreSQL row locks and `SKIP LOCKED`, so
+multiple workers cannot lease the same record.
+
+Each lease has a worker owner and expiration time. Workers can extend it through
+the internal heartbeat service. Retryable failures use capped exponential
+backoff; exhausted or permanent failures become terminal. A recovery service
+turns expired attempts into immutable `abandoned` history and safely reschedules
+or fails the job. Only safe error codes/messages are persisted.
+
+The typed handler registry executes one claimed job at a time and cannot run
+shell commands. Platform and publishing workers will register domain-specific
+handlers in later sprints.
+
 ## Errors
 
 - `401`: missing, invalid, expired, revoked, or disabled-user session

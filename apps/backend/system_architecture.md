@@ -194,6 +194,31 @@ API examples and the complete route list are documented in `API.md`.
 - Revision `0006` adds the publishing, approval, transition, and activity tables
   with restrictive foreign keys.
 
+## Durable job system
+
+- `DurableJob` stores workspace ownership, a typed JSON payload, priority,
+  schedule, attempt budget, idempotency hash, lease, safe errors, result, and
+  lifecycle timestamps.
+- `JobAttempt` preserves every execution attempt, including abandoned stale
+  leases. Jobs and attempts use restrictive foreign keys and no destructive ORM
+  cascades.
+- Workers claim eligible rows with `SELECT ... FOR UPDATE SKIP LOCKED`, commit
+  the lease, and only then execute a handler. Handler execution therefore never
+  holds a database transaction open.
+- Lease ownership is checked before heartbeat, completion, or failure.
+  Cancellation clears the lease, so a cancelled worker cannot record success.
+- Retryable failures use capped exponential backoff. Stale-lock recovery either
+  reschedules within the attempt budget or records a final failure.
+- Enqueueing can be idempotent per workspace and job type. Only a hash of the
+  opaque key is stored.
+- `JobRegistry` maps validated job types to typed Python callables. Unexpected
+  exceptions are converted to a generic safe error and never expose exception
+  text.
+- Generic enqueueing is internal rather than an API route. HTTP exposes
+  workspace observability and administrator cancellation only.
+- PostgreSQL is the queue; Redis and Celery are not required at the current
+  scale. Revision `0007` adds the job and attempt tables.
+
 ## Repository hardening controls
 
 - Docker publishes the development PostgreSQL port on `127.0.0.1` only. The
