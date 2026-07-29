@@ -20,6 +20,10 @@ class YouTubeOAuthStartRequest(IntegrationSchema):
     publishing: bool = False
 
 
+class InstagramOAuthStartRequest(IntegrationSchema):
+    publishing: bool = False
+
+
 class PlatformConnectionResponse(IntegrationSchema):
     id: UUID
     workspace_id: UUID
@@ -50,3 +54,20 @@ class PlatformQuotaUsageResponse(IntegrationSchema):
     units: int
     request_count: int
     updated_at: datetime
+
+
+class PlatformAccountMetricSnapshotResponse(IntegrationSchema):
+    id: UUID
+    connection_id: UUID
+    captured_at: datetime
+    period: str
+    values: dict[str, int | float | str | bool | None]
+    unavailable_fields: list[str]
+    provider_metadata: dict[str, object]
+    created_at: datetime
+
+
+class InstagramPublishingLimitResponse(IntegrationSchema):
+    quota_usage: int
+    quota_total: int
+    quota_duration_seconds: int

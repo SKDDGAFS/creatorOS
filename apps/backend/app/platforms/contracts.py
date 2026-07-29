@@ -65,6 +65,15 @@ class RemoteMetricSnapshot(AdapterModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class RemoteAccountMetricSnapshot(AdapterModel):
+    external_account_id: str = Field(min_length=1, max_length=255)
+    captured_at: AwareDatetime
+    period: str = Field(min_length=1, max_length=30)
+    values: dict[str, MetricValue] = Field(default_factory=dict)
+    unavailable_fields: tuple[str, ...] = ()
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class PublishRequest(AdapterModel):
     media_reference: str = Field(min_length=1, max_length=1000)
     title: str = Field(min_length=1, max_length=500)
@@ -152,6 +161,14 @@ class PlatformAdapter(Protocol):
         *,
         cursor: str | None = None,
     ) -> AdapterPage[RemoteMetricSnapshot]: ...
+
+    def sync_account_metrics(
+        self,
+        external_account_id: str,
+        credentials: CredentialMaterial,
+        *,
+        cursor: str | None = None,
+    ) -> AdapterPage[RemoteAccountMetricSnapshot]: ...
 
     def validate_publish_request(
         self,

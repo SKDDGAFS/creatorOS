@@ -413,3 +413,70 @@ users inactive because they do not have passwords.
   validation, upload dispatch, and status polling against fake transports.
 - Add exact Google Cloud/OAuth setup instructions and honest audit limitations.
 - Never contact Google or upload content in tests.
+
+# Sprint I implementation plan: Instagram integration
+
+## Verified official boundaries
+
+1. Use Business Login for Instagram and the Instagram API with Instagram Login
+   for professional Business and Creator accounts. This path does not require a
+   linked Facebook Page and cannot access consumer accounts, ads, or tagging.
+2. Request only `instagram_business_basic` and
+   `instagram_business_manage_insights` for synchronization. Request
+   `instagram_business_content_publish` only when publishing is explicitly
+   enabled.
+3. Use `graph.instagram.com` with a configurable supported API version for
+   profile, owned-media, insights, publishing-container, status, publishing
+   limit, and permission-revocation calls.
+4. Preserve cursor pagination and unavailable values. Current targeted media
+   insights expose total reach and engagement measurements, but do not provide
+   dependable Reels-tab, Feed, Explore, and profile reach breakdowns; those
+   extension fields remain null.
+5. Support officially documented image/video/Reels container creation,
+   publishing-limit inspection, container status checks, and final publication.
+   Runtime publishing remains disabled until CreatorOS has the authorized media
+   boundary from Sprint U.
+6. Classify Meta OAuth, permission, rate-limit, transient, and permanent errors
+   without persisting provider response bodies or token-bearing query strings.
+
+## Planned files
+
+- `[NEW] apps/backend/app/platforms/instagram/__init__.py`
+- `[NEW] apps/backend/app/platforms/instagram/oauth.py`
+- `[NEW] apps/backend/app/platforms/instagram/transport.py`
+- `[NEW] apps/backend/app/platforms/instagram/http_transport.py`
+- `[NEW] apps/backend/app/platforms/instagram/adapter.py`
+- `[NEW] apps/backend/app/services/instagram_service.py`
+- `[NEW] apps/backend/alembic/versions/0010_instagram_account_insights.py`
+- `[NEW] apps/backend/tests/test_instagram_integration.py`
+- `[NEW] docs/INSTAGRAM_SETUP.md`
+- `[MODIFY] apps/backend/app/platforms/contracts.py` — add provider-neutral
+  account metric snapshots.
+- `[MODIFY] apps/backend/app/platforms/runtime.py` — add the configured
+  Instagram adapter factory and keep runtime publishing media disabled.
+- `[MODIFY] apps/backend/app/core/config.py` and
+  `[MODIFY] apps/backend/.env.example` — add safe Meta app, redirect, API
+  version, timeout, and publishing settings.
+- `[MODIFY] apps/backend/app/models/platform_integration.py` and
+  `[MODIFY] apps/backend/app/models/__init__.py` — add append-only,
+  workspace-scoped account insight snapshots without secret material.
+- `[MODIFY] apps/backend/app/schemas/platform_integration.py` — add Instagram
+  OAuth, account insight, and publishing-limit responses.
+- `[MODIFY] apps/backend/app/api/routes/integrations.py` — add authorized
+  Instagram OAuth, sync, insight, limit, and disconnect routes.
+- `[MODIFY] apps/backend/API.md`, `[MODIFY] README.md`,
+  `[MODIFY] SECURITY.md`,
+  `[MODIFY] apps/backend/system_architecture.md`, and `[MODIFY] task.md` —
+  document setup, support boundaries, security, and verification.
+
+## Verification
+
+- Use fake transports and HTTP mock transports only; never contact Meta, use a
+  real account, revoke a real token, or publish media.
+- Test state hashing and one-time user binding, scope gating, token lifecycle,
+  pagination, profile/media mapping, account/media insights, null reach
+  breakdown semantics, publishing status and limits, error classification,
+  disconnect, authorization, and workspace isolation.
+- Review migration `0010` offline before applying it to local PostgreSQL.
+- Run Ruff, mypy, Pytest, Alembic current/drift/offline SQL, secret scanning,
+  diff checks, and unchanged-dependency verification.
