@@ -61,14 +61,14 @@
 
 ## Sprint F: Durable job system
 
-- [ ] Add workspace-owned durable jobs and attempt history.
-- [ ] Add scheduled, prioritized, idempotent enqueueing.
-- [ ] Add atomic row-lock claiming and expiring worker leases.
-- [ ] Add heartbeat, exponential retry, and stale-lock recovery.
-- [ ] Add cancellation and workspace job observability.
-- [ ] Add a typed handler registry and safe single-job runner.
-- [ ] Add and review migration `0007`.
-- [ ] Add queue, retry, locking, runner, and authorization tests.
-- [ ] Update API and architecture documentation.
-- [ ] Run quality, migration, dependency, and secret checks.
+- [x] Add workspace-owned durable jobs and attempt history.
+- [x] Add scheduled, prioritized, idempotent enqueueing.
+- [x] Add atomic row-lock claiming and expiring worker leases.
+- [x] Add heartbeat, exponential retry, and stale-lock recovery.
+- [x] Add cancellation and workspace job observability.
+- [x] Add a typed handler registry and safe single-job runner.
+- [x] Add and review migration `0007`.
+- [x] Add queue, retry, locking, runner, and authorization tests.
+- [x] Update API and architecture documentation.
+- [x] Run quality, migration, dependency, and secret checks.
 - [ ] Commit, push, and open a stacked draft Sprint F pull request.

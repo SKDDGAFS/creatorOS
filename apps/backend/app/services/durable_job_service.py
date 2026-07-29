@@ -61,7 +61,7 @@ def _normalize_payload(value: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def _validate_job_type(job_type: str) -> str:
+def normalize_job_type(job_type: str) -> str:
     normalized = job_type.strip().lower()
     if not JOB_TYPE_PATTERN.fullmatch(normalized):
         raise InvalidRequestError(
@@ -103,7 +103,7 @@ def enqueue_job(
     max_attempts: int = 3,
     idempotency_key: str | None = None,
 ) -> tuple[DurableJob, bool]:
-    normalized_type = _validate_job_type(job_type)
+    normalized_type = normalize_job_type(job_type)
     normalized_payload = _normalize_payload(payload)
     if priority < 0 or priority > 100:
         raise InvalidRequestError("priority must be between 0 and 100")
@@ -207,7 +207,7 @@ def list_jobs(
         statement = statement.where(DurableJob.status == status.value)
     if job_type is not None:
         statement = statement.where(
-            DurableJob.job_type == _validate_job_type(job_type)
+            DurableJob.job_type == normalize_job_type(job_type)
         )
     statement = (
         statement.order_by(DurableJob.created_at.desc(), DurableJob.id.desc())
@@ -228,7 +228,7 @@ def claim_next_job(
     normalized_worker = _validate_worker(worker_id, lease_seconds)
     claimed_at = _as_utc(now) if now is not None else _utc_now()
     normalized_types = (
-        {_validate_job_type(job_type) for job_type in job_types}
+        {normalize_job_type(job_type) for job_type in job_types}
         if job_types
         else None
     )

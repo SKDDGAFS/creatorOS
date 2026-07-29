@@ -13,6 +13,8 @@ The repository contains:
 - workspace-owned channel, video, and metric APIs;
 - an approval-gated publishing workflow that records intent without contacting
   external platforms;
+- a PostgreSQL-backed durable job queue with retries, leases, and attempt
+  history;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are

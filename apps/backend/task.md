@@ -74,3 +74,15 @@
 - [x] Review and apply migration `0006` to local PostgreSQL.
 - [x] Add state-machine, idempotency, authorization, and lifecycle tests.
 - [x] Document workflow semantics and API endpoints.
+
+# Durable job system checklist
+
+- [x] Add workspace-owned jobs and immutable attempt history.
+- [x] Add scheduled, prioritized, idempotent enqueueing.
+- [x] Add PostgreSQL row-lock claiming and expiring worker leases.
+- [x] Add heartbeat, exponential retry, stale recovery, and cancellation.
+- [x] Add typed handlers with safe unexpected-error handling.
+- [x] Add workspace observability and administrator cancellation APIs.
+- [x] Review and apply migration `0007` to local PostgreSQL.
+- [x] Add queue, locking, retry, runner, and authorization tests.
+- [x] Document queue semantics and operational boundaries.

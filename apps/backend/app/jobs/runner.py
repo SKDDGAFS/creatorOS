@@ -32,7 +32,7 @@ class JobRegistry:
         self._handlers: dict[str, JobHandler] = {}
 
     def register(self, job_type: str, handler: JobHandler) -> None:
-        normalized = job_type.strip().lower()
+        normalized = durable_job_service.normalize_job_type(job_type)
         if normalized in self._handlers:
             raise InvalidRequestError(
                 f"A handler is already registered for {normalized}"
