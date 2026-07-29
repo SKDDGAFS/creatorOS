@@ -141,6 +141,64 @@ class PlatformConnection(Base):
         cascade="save-update, merge",
         passive_deletes=True,
     )
+    account_metric_snapshots: Mapped[
+        list[PlatformAccountMetricSnapshot]
+    ] = relationship(
+        back_populates="connection",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+
+
+class PlatformAccountMetricSnapshot(Base):
+    __tablename__ = "platform_account_metric_snapshots"
+    __table_args__ = (
+        UniqueConstraint(
+            "connection_id",
+            "captured_at",
+            "period",
+            name="uq_platform_account_metric_snapshots_connection_capture_period",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    connection_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "platform_connections.id",
+            name=(
+                "fk_platform_account_metrics_connection_"
+                "platform_connections"
+            ),
+            ondelete="RESTRICT",
+        ),
+        index=True,
+    )
+    captured_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        index=True,
+    )
+    period: Mapped[str] = mapped_column(String(30))
+    values: Mapped[dict[str, Any]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"),
+        default=dict,
+    )
+    unavailable_fields: Mapped[list[str]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"),
+        default=list,
+    )
+    provider_metadata: Mapped[dict[str, Any]] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"),
+        default=dict,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        server_default=func.now(),
+    )
+
+    connection: Mapped[PlatformConnection] = relationship(
+        back_populates="account_metric_snapshots"
+    )
 
 
 class PlatformSyncCursor(Base):

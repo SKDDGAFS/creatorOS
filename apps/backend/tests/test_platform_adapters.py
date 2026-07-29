@@ -24,6 +24,7 @@ from app.platforms import (
     PublishResult,
     PublishStatus,
     PublishValidation,
+    RemoteAccountMetricSnapshot,
     RemoteChannel,
     RemoteMetricSnapshot,
     RemoteVideo,
@@ -179,6 +180,26 @@ class FakeAdapter:
                 ),
             ),
             next_cursor="metrics-next",
+        )
+
+    def sync_account_metrics(
+        self,
+        external_account_id: str,
+        credentials: CredentialMaterial,
+        *,
+        cursor: str | None = None,
+    ) -> AdapterPage[RemoteAccountMetricSnapshot]:
+        del credentials, cursor
+        return AdapterPage(
+            items=(
+                RemoteAccountMetricSnapshot(
+                    external_account_id=external_account_id,
+                    captured_at=datetime.now(UTC),
+                    period="day",
+                    values={"reach": 100},
+                ),
+            ),
+            next_cursor=None,
         )
 
     def validate_publish_request(

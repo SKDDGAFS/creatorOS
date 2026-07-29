@@ -27,6 +27,7 @@ from app.models.password_reset_token import PasswordResetToken
 from app.models.platform_integration import (
     ConnectionStatus,
     OAuthAuthorizationState,
+    PlatformAccountMetricSnapshot,
     PlatformConnection,
     PlatformOperation,
     PlatformOperationStatus,
@@ -69,6 +70,7 @@ __all__ = [
     "PasswordResetToken",
     "OAuthAuthorizationState",
     "Platform",
+    "PlatformAccountMetricSnapshot",
     "PlatformConnection",
     "PlatformOperation",
     "PlatformOperationStatus",

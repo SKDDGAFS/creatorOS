@@ -1,3 +1,4 @@
+import re
 from functools import lru_cache
 
 from pydantic import SecretStr, field_validator, model_validator
@@ -36,8 +37,22 @@ class Settings(BaseSettings):
     youtube_enable_publishing: bool = False
     youtube_http_timeout_seconds: float = 30.0
     youtube_analytics_lookback_days: int = 28
+    instagram_app_id: str | None = None
+    instagram_app_secret: SecretStr | None = None
+    instagram_oauth_redirect_uri: str = (
+        "http://127.0.0.1:8000/api/integrations/instagram/oauth/callback"
+    )
+    instagram_api_version: str = "v23.0"
+    instagram_enable_publishing: bool = False
+    instagram_http_timeout_seconds: float = 30.0
 
-    @field_validator("youtube_client_id", "youtube_client_secret", mode="before")
+    @field_validator(
+        "youtube_client_id",
+        "youtube_client_secret",
+        "instagram_app_id",
+        "instagram_app_secret",
+        mode="before",
+    )
     @classmethod
     def empty_optional_secrets_are_unset(cls, value: object) -> object:
         return None if value == "" else value
@@ -50,6 +65,10 @@ class Settings(BaseSettings):
             raise ValueError(
                 "YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET must be set together"
             )
+        if bool(self.instagram_app_id) != bool(self.instagram_app_secret):
+            raise ValueError(
+                "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET must be set together"
+            )
         if (
             self.environment.lower() == "production"
             and self.youtube_client_id
@@ -58,8 +77,20 @@ class Settings(BaseSettings):
             raise ValueError(
                 "YOUTUBE_OAUTH_REDIRECT_URI must use HTTPS in production"
             )
+        if (
+            self.environment.lower() == "production"
+            and self.instagram_app_id
+            and not self.instagram_oauth_redirect_uri.startswith("https://")
+        ):
+            raise ValueError(
+                "INSTAGRAM_OAUTH_REDIRECT_URI must use HTTPS in production"
+            )
         if self.youtube_http_timeout_seconds <= 0:
             raise ValueError("YOUTUBE_HTTP_TIMEOUT_SECONDS must be positive")
+        if self.instagram_http_timeout_seconds <= 0:
+            raise ValueError("INSTAGRAM_HTTP_TIMEOUT_SECONDS must be positive")
+        if re.fullmatch(r"v[1-9][0-9]*\.0", self.instagram_api_version) is None:
+            raise ValueError("INSTAGRAM_API_VERSION must look like v23.0")
         if not 1 <= self.oauth_state_ttl_minutes <= 60:
             raise ValueError("OAUTH_STATE_TTL_MINUTES must be between 1 and 60")
         if not 1 <= self.youtube_analytics_lookback_days <= 3650:

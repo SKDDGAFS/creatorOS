@@ -3,6 +3,13 @@ from collections.abc import Callable
 from app.core.config import get_settings
 from app.platforms.credentials import InMemoryPlatformSecretStore
 from app.platforms.errors import PlatformCapabilityError
+from app.platforms.instagram import InstagramAdapter, InstagramHttpTransport
+from app.platforms.instagram.http_transport import (
+    QuotaRecorder as InstagramQuotaRecorder,
+)
+from app.platforms.instagram.http_transport import (
+    RequestRecorder as InstagramRequestRecorder,
+)
 from app.platforms.youtube import (
     DisabledYouTubeMediaSource,
     YouTubeAdapter,
@@ -14,6 +21,10 @@ from app.services.errors import InvalidRequestError
 YouTubeAdapterFactory = Callable[
     [QuotaRecorder | None, RequestRecorder | None],
     YouTubeAdapter,
+]
+InstagramAdapterFactory = Callable[
+    [InstagramQuotaRecorder | None, InstagramRequestRecorder | None],
+    InstagramAdapter,
 ]
 
 _development_secret_store = InMemoryPlatformSecretStore()
@@ -54,8 +65,40 @@ def get_youtube_adapter_factory() -> YouTubeAdapterFactory:
     return factory
 
 
+def get_instagram_adapter_factory() -> InstagramAdapterFactory:
+    settings = get_settings()
+    app_id = settings.instagram_app_id
+    app_secret = settings.instagram_app_secret
+    if app_id is None or app_secret is None:
+        raise InvalidRequestError("Instagram OAuth is not configured")
+
+    def factory(
+        quota_recorder: InstagramQuotaRecorder | None,
+        request_recorder: InstagramRequestRecorder | None,
+    ) -> InstagramAdapter:
+        return InstagramAdapter(
+            InstagramHttpTransport(
+                app_id=app_id,
+                app_secret=app_secret,
+                api_version=settings.instagram_api_version,
+                quota_recorder=quota_recorder,
+                request_recorder=request_recorder,
+                timeout_seconds=settings.instagram_http_timeout_seconds,
+            )
+        )
+
+    return factory
+
+
 def require_youtube_publishing_media() -> None:
     raise PlatformCapabilityError(
         "youtube_media_unavailable",
         "YouTube publishing requires the CreatorOS media-storage sprint",
+    )
+
+
+def require_instagram_publishing_media() -> None:
+    raise PlatformCapabilityError(
+        "instagram_media_unavailable",
+        "Instagram publishing requires the CreatorOS media-storage sprint",
     )

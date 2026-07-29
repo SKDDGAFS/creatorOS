@@ -13,11 +13,12 @@ from app.platforms.contracts import (
     PublishResult,
     PublishStatus,
     PublishValidation,
+    RemoteAccountMetricSnapshot,
     RemoteChannel,
     RemoteMetricSnapshot,
     RemoteVideo,
 )
-from app.platforms.errors import PlatformPermanentError
+from app.platforms.errors import PlatformCapabilityError, PlatformPermanentError
 from app.platforms.youtube.oauth import YOUTUBE_UPLOAD_SCOPE
 from app.platforms.youtube.transport import YouTubeTransport
 
@@ -338,6 +339,19 @@ class YouTubeAdapter:
         return AdapterPage(
             items=(snapshot,),
             next_cursor=activity.get("next_cursor"),
+        )
+
+    def sync_account_metrics(
+        self,
+        external_account_id: str,
+        credentials: CredentialMaterial,
+        *,
+        cursor: str | None = None,
+    ) -> AdapterPage[RemoteAccountMetricSnapshot]:
+        del external_account_id, credentials, cursor
+        raise PlatformCapabilityError(
+            "youtube_account_metrics_unsupported",
+            "YouTube account metrics are not implemented by this adapter",
         )
 
     def validate_publish_request(
