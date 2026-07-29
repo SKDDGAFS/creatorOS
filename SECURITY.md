@@ -62,3 +62,20 @@ include credentials, tokens, personal data, or exploit details in a public issue
   non-viewer role.
 - Password-reset tokens have storage and expiry foundations only. No email
   delivery or public reset endpoint is enabled in this sprint.
+
+## Instagram integration boundary
+
+- Meta app secrets, authorization codes, and access tokens are never stored in
+  PostgreSQL or provider request logs.
+- OAuth state is random, hash-only at rest, short-lived, user/workspace-bound,
+  row-locked during callback, and one-time use.
+- The production environment refuses the in-memory development secret store.
+- Provider response bodies and token-bearing query parameters are excluded from
+  telemetry. Only method, host, path, status, duration, safe outcome, and
+  provider request ID are retained.
+- Publishing media and cover URLs must be public HTTPS URLs and cannot use
+  embedded credentials, localhost, or literal private/reserved addresses.
+- Runtime Instagram publishing remains unavailable until the authorized media
+  boundary is implemented. No real Meta account or content is used by tests.
+- Serving accounts not owned or managed by the app owner requires Meta
+  Advanced Access and App Review.

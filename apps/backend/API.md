@@ -303,6 +303,38 @@ connection `reconnect_required` and return `409`. Provider bodies and tokens are
 never returned. See `../../docs/YOUTUBE_SETUP.md` for setup, supported metrics,
 provider limitations, and rollback.
 
+## Instagram integration
+
+All integration routes require the authenticated session and workspace header.
+Write routes also require the session-bound CSRF header. OAuth start and
+disconnect require owner/admin access.
+
+```text
+POST   /api/integrations/instagram/oauth/start
+GET    /api/integrations/instagram/oauth/callback
+GET    /api/integrations/instagram/{connection_id}
+POST   /api/integrations/instagram/{connection_id}/sync/channel
+POST   /api/integrations/instagram/{connection_id}/sync/videos
+POST   /api/integrations/instagram/{connection_id}/sync/account-insights
+POST   /api/integrations/instagram/{connection_id}/sync/videos/{video_id}/metrics
+GET    /api/integrations/instagram/{connection_id}/publishing-limit
+GET    /api/integrations/instagram/{connection_id}/quota
+DELETE /api/integrations/instagram/{connection_id}
+```
+
+The OAuth start body is `{"publishing": false}` by default. Enabling it requires
+both `INSTAGRAM_ENABLE_PUBLISHING=true` and Meta granting
+`instagram_business_content_publish`.
+
+Account-insight synchronization returns append-only daily snapshots with
+`values`, `unavailable_fields`, and safe provider metadata. Missing data remains
+unavailable rather than becoming zero. Media metric synchronization uses the
+existing append-only video metric response and Instagram extension.
+
+The publishing-limit response contains `quota_usage`, `quota_total`, and
+`quota_duration_seconds`. It reads Meta's account-specific current limit; it
+does not publish content.
+
 ## Errors
 
 - `401`: missing, invalid, expired, revoked, or disabled-user session

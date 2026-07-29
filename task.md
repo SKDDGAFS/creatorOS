@@ -103,3 +103,21 @@
 - [x] Run quality, migration, and secret checks; document unchanged-dependency
   audit carry-forward.
 - [x] Commit, push, and open stacked draft pull request #9.
+
+## Sprint I: Instagram integration
+
+- [x] Add user-bound, one-time Instagram OAuth authorization.
+- [x] Request minimum read/insights scopes and optional publishing scope.
+- [x] Add professional-account and cursor-paginated media synchronization.
+- [x] Add account and media insight synchronization with unavailable-value
+  semantics.
+- [x] Preserve unsupported Reels-tab, Feed, Explore, and profile reach as null.
+- [x] Add publishing validation, container creation, finalization, and status
+  polling boundaries.
+- [x] Add API-call classification and publishing-limit inspection.
+- [x] Add disconnect, permission revocation, and credential deletion.
+- [x] Add migration `0010` for append-only account insight snapshots.
+- [x] Add mocked OAuth, transport, adapter, service, and route tests.
+- [x] Document Meta setup, access review, official limitations, and rollback.
+- [x] Run quality, migration, and secret checks.
+- [ ] Commit, push, and open a stacked draft pull request without merging.

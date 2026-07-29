@@ -20,6 +20,9 @@ The repository contains:
 - a credential-independent YouTube integration with secure OAuth state/PKCE,
   channel and video synchronization, analytics mappings, quota telemetry,
   upload validation, and mocked adapter tests;
+- a credential-independent Instagram professional-account integration with
+  secure OAuth state, account/media synchronization, append-only insights,
+  publishing-limit/status foundations, and mocked adapter tests;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -66,9 +69,9 @@ Open `http://localhost:3000`. The API documentation is at
 `http://127.0.0.1:8000/docs`.
 
 Real YouTube, Instagram, and TikTok credentials are not committed or used by
-tests. YouTube's code and exact manual setup are documented in
-`docs/YOUTUBE_SETUP.md`; the included secret store is local/test only and real
-publishing remains disabled.
+tests. Exact manual setup and limitations are documented in
+`docs/YOUTUBE_SETUP.md` and `docs/INSTAGRAM_SETUP.md`. The included secret store
+is local/test only and real publishing remains disabled.
 
 ## Verification
 

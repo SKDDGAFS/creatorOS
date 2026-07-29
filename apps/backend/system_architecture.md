@@ -309,3 +309,29 @@ remain zero, and click-through rates use decimal ratios. The shared
 reported impressions CTR is retained separately in its extension. Future
 platform adapters must map official source fields without filling unsupported
 measurements.
+
+## Instagram integration
+
+- `platforms/instagram/oauth.py` implements Instagram Login state creation and
+  one-time callback claiming. It requests basic and insights scopes by default
+  and gates the content-publishing scope behind explicit configuration.
+- `InstagramHttpTransport` is the only Meta HTTP boundary. It uses fixed
+  Instagram origins, a configurable versioned Graph path, bearer headers,
+  bounded timeouts, safe Meta error classification, request telemetry, and
+  per-bucket usage accounting.
+- `InstagramAdapter` maps one professional account to a channel, paginated owned
+  media to videos, media insights to append-only video metrics, and daily
+  account insights to provider-neutral account snapshots.
+- `PlatformAccountMetricSnapshot` stores append-only connection-level insight
+  values, unavailable-field names, period, and safe provider metadata. Revision
+  `0010` adds the table with a restrictive connection foreign key.
+- Total reach maps to `accounts_reached`. Current targeted endpoints do not
+  expose dependable Reels-tab, Feed, Explore, or profile reach breakdowns, so
+  those fields stay null.
+- The adapter validates public HTTPS media references, creates official
+  publishing containers, checks their state, finalizes ready containers, and
+  reads the rolling publishing limit. Runtime dispatch remains disabled until
+  the media-storage and publishing-worker sprints.
+- Disconnect revokes Meta permissions, marks the SQL connection disconnected,
+  and removes the secret-store reference. Provider messages and response bodies
+  never enter persisted telemetry.
