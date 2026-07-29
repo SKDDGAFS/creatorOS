@@ -43,4 +43,4 @@
 - [x] Add service, API, authorization, and constraint tests.
 - [x] Update API and architecture documentation.
 - [x] Run quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open a draft Sprint D pull request.
+- [x] Commit, push, and open draft pull request #5.
