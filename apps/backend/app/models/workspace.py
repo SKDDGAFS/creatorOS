@@ -18,6 +18,7 @@ from app.db.base import Base, utc_now
 if TYPE_CHECKING:
     from app.models.channel import Channel
     from app.models.growth_signal import GrowthSignalProfile
+    from app.models.publishing import ActivityEvent, PublishingJob
     from app.models.user import User
 
 
@@ -56,6 +57,16 @@ class Workspace(Base):
         passive_deletes=True,
     )
     growth_signal_profiles: Mapped[list[GrowthSignalProfile]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    publishing_jobs: Mapped[list[PublishingJob]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    activity_events: Mapped[list[ActivityEvent]] = relationship(
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,

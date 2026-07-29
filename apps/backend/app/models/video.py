@@ -18,6 +18,7 @@ from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
     from app.models.channel import Channel
+    from app.models.publishing import PublishingJob
     from app.models.video_metric import VideoMetric
 
 
@@ -84,6 +85,11 @@ class Video(Base):
         cascade="save-update, merge",
     )
     metrics: Mapped[list[VideoMetric]] = relationship(
+        back_populates="video",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    publishing_jobs: Mapped[list[PublishingJob]] = relationship(
         back_populates="video",
         cascade="save-update, merge",
         passive_deletes=True,

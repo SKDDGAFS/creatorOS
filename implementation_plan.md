@@ -310,3 +310,26 @@ users inactive because they do not have passwords.
 - Scores remain between zero and one and never imply causal certainty.
 - Review migration `0005` SQL before local application.
 - Add service, API, authorization, scoring, constraint, and edge-case tests.
+
+# Sprint E implementation plan: publishing workflow
+
+## Scope
+
+1. Add workspace-owned publishing jobs linked to workspace-owned videos.
+2. Enforce the roadmap states through one centralized transition graph; no route
+   accepts arbitrary status updates.
+3. Require a pending human approval before scheduling or publishing.
+4. Add approval decisions, schedules, cancellations, safe failures, retries,
+   immutable transition history, and activity events.
+5. Make job creation idempotent per workspace through an opaque
+   `Idempotency-Key` request header.
+6. Keep every state change and its audit/activity records in one database
+   transaction.
+
+## Boundaries
+
+- This sprint records workflow intent only and never calls a social platform.
+- Worker-only publishing transitions remain service methods until the durable job
+  and adapter sprints.
+- Published content cannot be deleted through this workflow.
+- Review migration `0006` SQL before local application.

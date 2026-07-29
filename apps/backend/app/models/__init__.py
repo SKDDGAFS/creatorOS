@@ -18,6 +18,15 @@ from app.models.growth_signal import (
     SignalTier,
 )
 from app.models.password_reset_token import PasswordResetToken
+from app.models.publishing import (
+    ActivityEvent,
+    ActivityType,
+    ApprovalRequest,
+    ApprovalStatus,
+    PublishingJob,
+    PublishingState,
+    PublishingTransition,
+)
 from app.models.user import User
 from app.models.video import Video, VideoStatus
 from app.models.video_metric import VideoMetric
@@ -26,6 +35,10 @@ from app.models.workspace import Workspace, WorkspaceMembership, WorkspaceRole
 __all__ = [
     "AuthSession",
     "AuthThrottle",
+    "ActivityEvent",
+    "ActivityType",
+    "ApprovalRequest",
+    "ApprovalStatus",
     "Channel",
     "GrowthSignal",
     "GrowthSignalProfile",
@@ -33,6 +46,9 @@ __all__ = [
     "InstagramMetricExtension",
     "PasswordResetToken",
     "Platform",
+    "PublishingJob",
+    "PublishingState",
+    "PublishingTransition",
     "SignalTier",
     "TikTokMetricExtension",
     "User",

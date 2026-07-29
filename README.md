@@ -11,6 +11,8 @@ The repository contains:
 - local PostgreSQL 16 through Docker Compose;
 - session-based authentication, CSRF protection, and workspace roles;
 - workspace-owned channel, video, and metric APIs;
+- an approval-gated publishing workflow that records intent without contacting
+  external platforms;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
