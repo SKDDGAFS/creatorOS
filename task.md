@@ -136,4 +136,4 @@
 - [x] Add OAuth, transport, adapter, service, route, and authorization tests.
 - [x] Document TikTok setup, review requirements, restrictions, and unsupported analytics.
 - [x] Run quality, migration, dependency, and secret checks.
-- [ ] Commit, push, and open stacked draft pull request without merging.
+- [x] Commit, push, and open stacked draft pull request #11 without merging.
