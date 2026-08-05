@@ -24,6 +24,10 @@ class InstagramOAuthStartRequest(IntegrationSchema):
     publishing: bool = False
 
 
+class TikTokOAuthStartRequest(IntegrationSchema):
+    publishing: bool = False
+
+
 class PlatformConnectionResponse(IntegrationSchema):
     id: UUID
     workspace_id: UUID

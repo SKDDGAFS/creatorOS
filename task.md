@@ -121,3 +121,19 @@
 - [x] Document Meta setup, access review, official limitations, and rollback.
 - [x] Run quality, migration, and secret checks.
 - [x] Commit, push, and open stacked draft pull request #10 without merging.
+
+## Sprint J: TikTok integration
+
+- [ ] Add secure TikTok OAuth state, callback, refresh, and revocation foundations.
+- [ ] Request minimum read scopes and optional publishing scopes.
+- [ ] Add authorized profile and account-stat synchronization.
+- [ ] Add cursor-paginated public-video synchronization.
+- [ ] Map available video metrics and preserve unavailable analytics as null.
+- [ ] Add creator-info and publishing-validation boundaries.
+- [ ] Add mocked publish initialization and status polling.
+- [ ] Add rate-limit and classified TikTok error handling.
+- [ ] Add disconnect and credential deletion.
+- [ ] Add OAuth, transport, adapter, service, route, and authorization tests.
+- [ ] Document TikTok setup, review requirements, restrictions, and unsupported analytics.
+- [ ] Run quality, migration, dependency, and secret checks.
+- [ ] Commit, push, and open stacked draft pull request without merging.

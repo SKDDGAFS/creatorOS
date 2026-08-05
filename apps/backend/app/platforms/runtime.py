@@ -10,6 +10,11 @@ from app.platforms.instagram.http_transport import (
 from app.platforms.instagram.http_transport import (
     RequestRecorder as InstagramRequestRecorder,
 )
+from app.platforms.tiktok import TikTokAdapter, TikTokHttpTransport
+from app.platforms.tiktok.http_transport import QuotaRecorder as TikTokQuotaRecorder
+from app.platforms.tiktok.http_transport import (
+    RequestRecorder as TikTokRequestRecorder,
+)
 from app.platforms.youtube import (
     DisabledYouTubeMediaSource,
     YouTubeAdapter,
@@ -25,6 +30,10 @@ YouTubeAdapterFactory = Callable[
 InstagramAdapterFactory = Callable[
     [InstagramQuotaRecorder | None, InstagramRequestRecorder | None],
     InstagramAdapter,
+]
+TikTokAdapterFactory = Callable[
+    [TikTokQuotaRecorder | None, TikTokRequestRecorder | None],
+    TikTokAdapter,
 ]
 
 _development_secret_store = InMemoryPlatformSecretStore()
@@ -90,6 +99,30 @@ def get_instagram_adapter_factory() -> InstagramAdapterFactory:
     return factory
 
 
+def get_tiktok_adapter_factory() -> TikTokAdapterFactory:
+    settings = get_settings()
+    client_key = settings.tiktok_client_key
+    client_secret = settings.tiktok_client_secret
+    if client_key is None or client_secret is None:
+        raise InvalidRequestError("TikTok OAuth is not configured")
+
+    def factory(
+        quota_recorder: TikTokQuotaRecorder | None,
+        request_recorder: TikTokRequestRecorder | None,
+    ) -> TikTokAdapter:
+        return TikTokAdapter(
+            TikTokHttpTransport(
+                client_key=client_key,
+                client_secret=client_secret,
+                quota_recorder=quota_recorder,
+                request_recorder=request_recorder,
+                timeout_seconds=settings.tiktok_http_timeout_seconds,
+            )
+        )
+
+    return factory
+
+
 def require_youtube_publishing_media() -> None:
     raise PlatformCapabilityError(
         "youtube_media_unavailable",
@@ -101,4 +134,11 @@ def require_instagram_publishing_media() -> None:
     raise PlatformCapabilityError(
         "instagram_media_unavailable",
         "Instagram publishing requires the CreatorOS media-storage sprint",
+    )
+
+
+def require_tiktok_publishing_media() -> None:
+    raise PlatformCapabilityError(
+        "tiktok_media_unavailable",
+        "TikTok publishing requires the CreatorOS media-storage sprint",
     )

@@ -241,8 +241,8 @@ handlers in later sprints.
 
 ## Platform adapter framework
 
-The adapter framework is the internal provider boundary. YouTube is the first
-concrete provider; Instagram and TikTok remain unconfigured.
+The adapter framework is the internal provider boundary. YouTube, Instagram,
+and TikTok have credential-independent implementations behind that boundary.
 
 Every adapter implements typed methods for:
 
@@ -334,6 +334,36 @@ existing append-only video metric response and Instagram extension.
 The publishing-limit response contains `quota_usage`, `quota_total`, and
 `quota_duration_seconds`. It reads Meta's account-specific current limit; it
 does not publish content.
+
+## TikTok integration
+
+All routes require an authenticated session and workspace membership. Write
+routes require the session-bound CSRF header; OAuth start and disconnect require
+owner or administrator access. The callback must be completed by the same user
+who created the one-time OAuth state.
+
+```text
+POST   /api/integrations/tiktok/oauth/start
+GET    /api/integrations/tiktok/oauth/callback
+GET    /api/integrations/tiktok/{connection_id}
+POST   /api/integrations/tiktok/{connection_id}/sync/channel
+POST   /api/integrations/tiktok/{connection_id}/sync/videos
+POST   /api/integrations/tiktok/{connection_id}/sync/account-insights
+POST   /api/integrations/tiktok/{connection_id}/sync/videos/{video_id}/metrics
+GET    /api/integrations/tiktok/{connection_id}/quota
+DELETE /api/integrations/tiktok/{connection_id}
+```
+
+OAuth start accepts `{"publishing": false}`. A true value requires
+`TIKTOK_ENABLE_PUBLISHING=true` and an approved `video.publish` scope. Runtime
+publishing still remains disabled until the authorized media boundary exists.
+
+Video sync preserves TikTok's opaque cursor. Profile statistics become
+append-only account snapshots, and public video counters become append-only
+video metrics. Traffic sources, retention, impressions, and click-through rate
+remain null because the Display API does not provide those owner analytics.
+Provider authentication failures require reconnection; rate limits return 429.
+See `../../docs/TIKTOK_SETUP.md` for setup and provider restrictions.
 
 ## Errors
 

@@ -335,3 +335,23 @@ measurements.
 - Disconnect revokes Meta permissions, marks the SQL connection disconnected,
   and removes the secret-store reference. Provider messages and response bodies
   never enter persisted telemetry.
+
+## TikTok integration
+
+- `platforms/tiktok/oauth.py` creates a one-time, user/workspace-bound OAuth
+  state for Login Kit v2 and gates `video.publish` behind explicit settings.
+- `TikTokHttpTransport` owns all TikTok HTTP behavior: token lifecycle, profile,
+  Display API video pages, creator-information validation, direct-post
+  initialization/status contracts, quota callbacks, and redacted telemetry.
+- `TikTokAdapter` maps profile and video resources into provider-neutral DTOs.
+  Display API counters map to reported metric fields; unavailable traffic,
+  retention, impression, and click-through analytics remain null.
+- `tiktok_service` owns credential refresh, safe connection replacement,
+  workspace-scoped upserts, opaque cursor persistence, append-only account and
+  video snapshots, telemetry flushing, revocation, and secret deletion.
+- The implementation reuses revision `0010` tables, including
+  `TikTokMetricExtension`; Sprint J requires no schema migration.
+- Direct-post validation queries current creator restrictions and requires an
+  explicit privacy choice. Runtime media dispatch remains disabled until the
+  authorized media-store boundary is implemented. Tests inject a fake transport
+  and never contact TikTok.
