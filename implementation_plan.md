@@ -480,3 +480,46 @@ users inactive because they do not have passwords.
 - Review migration `0010` offline before applying it to local PostgreSQL.
 - Run Ruff, mypy, Pytest, Alembic current/drift/offline SQL, secret scanning,
   diff checks, and unchanged-dependency verification.
+
+# Sprint J implementation plan: TikTok integration
+
+## Verified official boundaries
+
+1. Use TikTok Login Kit OAuth v2 with one-time, user-bound anti-CSRF state and server-side token storage.
+2. Request only `user.info.basic`, required profile/stat scopes, and `video.list`; request `video.upload` or `video.publish` only when publishing is explicitly enabled.
+3. Synchronize the authorized profile and cursor-paginated public videos through TikTok's Display API.
+4. Store exposed view, like, comment, share, and account counts. Keep unavailable retention, audience, and traffic-source analytics null.
+5. Require current creator information, explicit consent, supported privacy choices, and media validation before any publish request.
+6. Keep runtime publishing disabled until Sprint U provides authorized media storage. Never contact TikTok or publish in tests.
+7. Classify authentication, permission, rate-limit, transient, and permanent errors without logging tokens or response bodies.
+8. Document TikTok review requirements, unaudited private-post restrictions, and unsupported analytics honestly.
+
+## Planned files
+
+- `[NEW] apps/backend/app/platforms/tiktok/__init__.py`
+- `[NEW] apps/backend/app/platforms/tiktok/oauth.py`
+- `[NEW] apps/backend/app/platforms/tiktok/transport.py`
+- `[NEW] apps/backend/app/platforms/tiktok/http_transport.py`
+- `[NEW] apps/backend/app/platforms/tiktok/adapter.py`
+- `[NEW] apps/backend/app/services/tiktok_service.py`
+- `[NEW] apps/backend/tests/test_tiktok_integration.py`
+- `[NEW] docs/TIKTOK_SETUP.md`
+- `[MODIFY] apps/backend/app/core/config.py`
+- `[MODIFY] apps/backend/.env.example`
+- `[MODIFY] apps/backend/app/platforms/runtime.py`
+- `[MODIFY] apps/backend/app/schemas/platform_integration.py`
+- `[MODIFY] apps/backend/app/api/routes/integrations.py`
+- `[MODIFY] apps/backend/API.md`
+- `[MODIFY] apps/backend/system_architecture.md`
+- `[MODIFY] README.md`
+- `[MODIFY] SECURITY.md`
+- `[MODIFY] task.md`
+
+No migration is planned: Sprint J reuses the existing platform connection, account metric snapshot, video metric, TikTok extension, cursor, quota, operation, and redacted request-log tables.
+
+## Verification
+
+- Use fake and mocked HTTP transports only.
+- Test OAuth state, scope gating, refresh, pagination, mappings, nullable unavailable metrics, publishing validation/status, error classification, disconnect, authorization, and workspace isolation.
+- Run Pytest, Ruff, Mypy, Alembic current/drift/offline checks, secret scanning, dependency verification, and `git diff --check`.
+- Commit, push, and open a stacked draft pull request without merging.

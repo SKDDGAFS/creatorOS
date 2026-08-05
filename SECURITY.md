@@ -79,3 +79,19 @@ include credentials, tokens, personal data, or exploit details in a public issue
   boundary is implemented. No real Meta account or content is used by tests.
 - Serving accounts not owned or managed by the app owner requires Meta
   Advanced Access and App Review.
+
+## TikTok integration boundary
+
+- TikTok client secrets, authorization codes, access tokens, and refresh tokens
+  never belong in PostgreSQL, API responses, or provider request telemetry.
+- OAuth state is random, hash-only at rest, short-lived, one-time, and bound to
+  the initiating user and workspace.
+- The transport uses fixed HTTPS provider origins, bounded timeouts, disabled
+  environment-proxy inheritance, no redirects, and safe error classification.
+- Request telemetry excludes query strings, bearer headers, form bodies, and
+  response bodies. Only safe operational metadata is persisted.
+- Proposed media sources must be public HTTPS URLs and cannot resolve to local,
+  private, loopback, link-local, or reserved literal addresses.
+- Requesting `video.publish` requires explicit configuration, but runtime
+  TikTok publishing remains disabled until the authorized media boundary is
+  implemented and reviewed. Tests use fake transports and never publish.

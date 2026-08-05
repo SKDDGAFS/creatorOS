@@ -45,12 +45,21 @@ class Settings(BaseSettings):
     instagram_api_version: str = "v23.0"
     instagram_enable_publishing: bool = False
     instagram_http_timeout_seconds: float = 30.0
+    tiktok_client_key: str | None = None
+    tiktok_client_secret: SecretStr | None = None
+    tiktok_oauth_redirect_uri: str = (
+        "http://127.0.0.1:8000/api/integrations/tiktok/oauth/callback"
+    )
+    tiktok_enable_publishing: bool = False
+    tiktok_http_timeout_seconds: float = 30.0
 
     @field_validator(
         "youtube_client_id",
         "youtube_client_secret",
         "instagram_app_id",
         "instagram_app_secret",
+        "tiktok_client_key",
+        "tiktok_client_secret",
         mode="before",
     )
     @classmethod
@@ -69,14 +78,16 @@ class Settings(BaseSettings):
             raise ValueError(
                 "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET must be set together"
             )
+        if bool(self.tiktok_client_key) != bool(self.tiktok_client_secret):
+            raise ValueError(
+                "TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET must be set together"
+            )
         if (
             self.environment.lower() == "production"
             and self.youtube_client_id
             and not self.youtube_oauth_redirect_uri.startswith("https://")
         ):
-            raise ValueError(
-                "YOUTUBE_OAUTH_REDIRECT_URI must use HTTPS in production"
-            )
+            raise ValueError("YOUTUBE_OAUTH_REDIRECT_URI must use HTTPS in production")
         if (
             self.environment.lower() == "production"
             and self.instagram_app_id
@@ -85,10 +96,18 @@ class Settings(BaseSettings):
             raise ValueError(
                 "INSTAGRAM_OAUTH_REDIRECT_URI must use HTTPS in production"
             )
+        if (
+            self.environment.lower() == "production"
+            and self.tiktok_client_key
+            and not self.tiktok_oauth_redirect_uri.startswith("https://")
+        ):
+            raise ValueError("TIKTOK_OAUTH_REDIRECT_URI must use HTTPS in production")
         if self.youtube_http_timeout_seconds <= 0:
             raise ValueError("YOUTUBE_HTTP_TIMEOUT_SECONDS must be positive")
         if self.instagram_http_timeout_seconds <= 0:
             raise ValueError("INSTAGRAM_HTTP_TIMEOUT_SECONDS must be positive")
+        if self.tiktok_http_timeout_seconds <= 0:
+            raise ValueError("TIKTOK_HTTP_TIMEOUT_SECONDS must be positive")
         if re.fullmatch(r"v[1-9][0-9]*\.0", self.instagram_api_version) is None:
             raise ValueError("INSTAGRAM_API_VERSION must look like v23.0")
         if not 1 <= self.oauth_state_ttl_minutes <= 60:
