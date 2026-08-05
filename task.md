@@ -124,16 +124,16 @@
 
 ## Sprint J: TikTok integration
 
-- [ ] Add secure TikTok OAuth state, callback, refresh, and revocation foundations.
-- [ ] Request minimum read scopes and optional publishing scopes.
-- [ ] Add authorized profile and account-stat synchronization.
-- [ ] Add cursor-paginated public-video synchronization.
-- [ ] Map available video metrics and preserve unavailable analytics as null.
-- [ ] Add creator-info and publishing-validation boundaries.
-- [ ] Add mocked publish initialization and status polling.
-- [ ] Add rate-limit and classified TikTok error handling.
-- [ ] Add disconnect and credential deletion.
-- [ ] Add OAuth, transport, adapter, service, route, and authorization tests.
-- [ ] Document TikTok setup, review requirements, restrictions, and unsupported analytics.
-- [ ] Run quality, migration, dependency, and secret checks.
+- [x] Add secure TikTok OAuth state, callback, refresh, and revocation foundations.
+- [x] Request minimum read scopes and optional publishing scopes.
+- [x] Add authorized profile and account-stat synchronization.
+- [x] Add cursor-paginated public-video synchronization.
+- [x] Map available video metrics and preserve unavailable analytics as null.
+- [x] Add creator-info and publishing-validation boundaries.
+- [x] Add mocked publish initialization and status polling.
+- [x] Add rate-limit and classified TikTok error handling.
+- [x] Add disconnect and credential deletion.
+- [x] Add OAuth, transport, adapter, service, route, and authorization tests.
+- [x] Document TikTok setup, review requirements, restrictions, and unsupported analytics.
+- [x] Run quality, migration, dependency, and secret checks.
 - [ ] Commit, push, and open stacked draft pull request without merging.
