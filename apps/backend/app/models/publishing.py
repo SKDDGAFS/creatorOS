@@ -57,6 +57,12 @@ class ActivityType(str, Enum):
     CANCELLED = "publishing_cancelled"
     FAILED = "publishing_failed"
     PUBLISHED = "publishing_succeeded"
+    ANALYTICS_SYNC_SCHEDULED = "analytics_sync_scheduled"
+    ANALYTICS_SYNC_STARTED = "analytics_sync_started"
+    ANALYTICS_SYNC_RETRY_SCHEDULED = "analytics_sync_retry_scheduled"
+    ANALYTICS_SYNC_FAILED = "analytics_sync_failed"
+    ANALYTICS_SYNC_SUCCEEDED = "analytics_sync_succeeded"
+    ANALYTICS_SYNC_SKIPPED = "analytics_sync_skipped"
 
 
 PUBLISHING_STATES = ", ".join(f"'{state.value}'" for state in PublishingState)
@@ -259,7 +265,10 @@ class ActivityEvent(Base):
             "('publishing_job_created', 'publishing_state_changed', "
             "'approval_requested', 'approval_approved', 'approval_rejected', "
             "'publishing_scheduled', 'publishing_cancelled', "
-            "'publishing_failed', 'publishing_succeeded')",
+            "'publishing_failed', 'publishing_succeeded', "
+            "'analytics_sync_scheduled', 'analytics_sync_started', "
+            "'analytics_sync_retry_scheduled', 'analytics_sync_failed', "
+            "'analytics_sync_succeeded', 'analytics_sync_skipped')",
             name="event_type_allowed",
         ),
     )

@@ -137,3 +137,22 @@
 - [x] Document TikTok setup, review requirements, restrictions, and unsupported analytics.
 - [x] Run quality, migration, dependency, and secret checks.
 - [x] Commit, push, and open stacked draft pull request #11 without merging.
+
+## Sprint K: Analytics worker
+
+- [x] Add workspace-owned analytics synchronization runs and health state.
+- [x] Add idempotent scheduling on the durable job system.
+- [x] Add a context-aware analytics job handler without breaking existing handlers.
+- [x] Synchronize active channels, videos, account metrics, and video metrics.
+- [x] Preserve provider cursors and prevent duplicate metric snapshots.
+- [x] Skip inactive channels before provider access.
+- [x] Classify rate limits and temporary failures for safe retries.
+- [x] Emit safe analytics activity events.
+- [x] Add workspace-scoped scheduling, history, run, and health APIs.
+- [x] Add fake-adapter worker, idempotency, retry, health, and isolation tests.
+- [x] Add migration `0011` and update API, architecture, security, and skill plans.
+- [x] Run backend and dashboard quality, offline migration, dependency, diff,
+  and secret checks.
+- [ ] Apply migration `0011`, run schema drift, and validate Compose against a
+  live PostgreSQL instance when Docker is available.
+- [ ] Commit, push, and open a stacked draft pull request without merging.

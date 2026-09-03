@@ -26,6 +26,9 @@ The repository contains:
 - a credential-independent TikTok integration with secure OAuth state, profile
   and video synchronization, public metric mappings, publishing validation,
   quota telemetry, and mocked transport tests;
+- a durable analytics worker with idempotent scheduling, provider cursor reuse,
+  append-only metric synchronization, safe retries, activity events, and
+  workspace-scoped health reporting;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -109,4 +112,6 @@ npm audit --audit-level=high
   working files manually.
 
 Architecture details are in `apps/backend/system_architecture.md`; API behavior
-is documented in `apps/backend/API.md`.
+is documented in `apps/backend/API.md`. The roadmap for turning Codex's local
+development skills into reviewed CreatorOS capabilities is in
+`docs/SKILLS_INTEGRATION_PLAN.md`.

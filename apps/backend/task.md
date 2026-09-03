@@ -113,3 +113,17 @@
 - [x] Review and apply migration `0009` to local PostgreSQL.
 - [x] Add mocked OAuth, transport, sync, publishing, quota, and route tests.
 - [x] Document Google setup, provider limitations, and rollback.
+
+# Analytics worker checklist
+
+- [x] Add workspace-owned run state linked to durable jobs and connections.
+- [x] Add idempotent scheduling and connection health APIs.
+- [x] Register the typed analytics handler with the durable runner.
+- [x] Synchronize provider data through existing service boundaries.
+- [x] Add safe retries, inactive-channel skipping, and activity events.
+- [x] Make captured metric snapshots idempotent.
+- [x] Add migration `0011`, tests, and documentation.
+- [x] Complete tests, lint, typing, dependency, offline migration, diff, and
+  secret verification.
+- [ ] Apply migration `0011` and run the live PostgreSQL schema drift check when
+  Docker is available.

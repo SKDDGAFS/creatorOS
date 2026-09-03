@@ -16,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.analytics_sync import AnalyticsSyncRun
     from app.models.channel import Channel
     from app.models.durable_job import DurableJob
     from app.models.growth_signal import GrowthSignalProfile
@@ -79,6 +80,11 @@ class Workspace(Base):
         passive_deletes=True,
     )
     platform_connections: Mapped[list[PlatformConnection]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    analytics_sync_runs: Mapped[list[AnalyticsSyncRun]] = relationship(
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,

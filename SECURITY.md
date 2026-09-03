@@ -95,3 +95,16 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - Requesting `video.publish` requires explicit configuration, but runtime
   TikTok publishing remains disabled until the authorized media boundary is
   implemented and reviewed. Tests use fake transports and never publish.
+
+## Analytics worker boundary
+
+- Scheduling and run visibility are workspace scoped. Scheduling requires CSRF
+  validation and write access.
+- Durable-job payloads contain only a connection UUID. Credential material stays
+  behind the existing `CredentialStore` boundary.
+- Existing inactive channels are skipped before a provider request is made.
+- Provider errors are converted to fixed, safe worker messages. Response bodies,
+  tokens, and raw exception text do not enter sync runs or activity events.
+- Cursor updates follow successful data writes. Metric snapshot uniqueness makes
+  retrying a previously stored page safe.
+- The worker uses typed Python callables and has no shell-execution capability.

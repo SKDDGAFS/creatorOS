@@ -11,6 +11,7 @@ type JobHandler = Callable[
     [dict[str, Any]],
     dict[str, Any] | None,
 ]
+type ContextJobHandler = Callable[[DurableJob], dict[str, Any] | None]
 
 
 class RetryableJobError(Exception):
@@ -29,7 +30,7 @@ class PermanentJobError(Exception):
 
 class JobRegistry:
     def __init__(self) -> None:
-        self._handlers: dict[str, JobHandler] = {}
+        self._handlers: dict[str, ContextJobHandler] = {}
 
     def register(self, job_type: str, handler: JobHandler) -> None:
         normalized = durable_job_service.normalize_job_type(job_type)
@@ -37,9 +38,21 @@ class JobRegistry:
             raise InvalidRequestError(
                 f"A handler is already registered for {normalized}"
             )
+        self._handlers[normalized] = lambda job: handler(job.payload)
+
+    def register_context_handler(
+        self,
+        job_type: str,
+        handler: ContextJobHandler,
+    ) -> None:
+        normalized = durable_job_service.normalize_job_type(job_type)
+        if normalized in self._handlers:
+            raise InvalidRequestError(
+                f"A handler is already registered for {normalized}"
+            )
         self._handlers[normalized] = handler
 
-    def get(self, job_type: str) -> JobHandler | None:
+    def get(self, job_type: str) -> ContextJobHandler | None:
         return self._handlers.get(job_type)
 
     @property
@@ -76,7 +89,7 @@ def run_once(
             retryable=False,
         )
     try:
-        result = handler(job.payload)
+        result = handler(job)
     except RetryableJobError as exc:
         return durable_job_service.fail_job(
             db,

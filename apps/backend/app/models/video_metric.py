@@ -12,6 +12,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Numeric,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -88,6 +89,11 @@ class VideoMetric(Base):
             "ix_video_metrics_video_id_captured_at",
             "video_id",
             "captured_at",
+        ),
+        UniqueConstraint(
+            "video_id",
+            "captured_at",
+            name="uq_video_metrics_video_id_captured_at",
         ),
     )
 

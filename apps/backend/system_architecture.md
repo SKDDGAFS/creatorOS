@@ -219,6 +219,29 @@ API examples and the complete route list are documented in `API.md`.
 - PostgreSQL is the queue; Redis and Celery are not required at the current
   scale. Revision `0007` adds the job and attempt tables.
 
+## Analytics synchronization worker
+
+- `AnalyticsSyncRun` links one provider connection to one durable job and stores
+  lifecycle state, safe errors, counts, and a small result summary.
+- `analytics_sync_service` schedules workspace-scoped jobs idempotently and
+  supplies run history and connection health without exposing credentials.
+- `jobs.analytics` registers a context-aware handler. Existing payload-only
+  handlers remain compatible with the registry.
+- The worker dispatches through the existing YouTube, Instagram, and TikTok
+  services. Those services retain ownership of credential loading, telemetry,
+  provider error classification, cursor updates, and metric mapping.
+- An existing inactive channel is skipped before any provider call. Connected
+  accounts without a local channel are synchronized so their channel can be
+  discovered.
+- Rate limits and temporary persistence errors become retryable durable-job
+  failures. Other safe service failures become terminal. Raw exception text is
+  never persisted by the analytics worker.
+- Video metric snapshots are unique by video and capture time. Cursor writes
+  happen after data writes, so retries cannot lose a page and repeated pages do
+  not create duplicate snapshots.
+- Revision `0011` adds analytics sync runs, expands activity-event types, and
+  adds the metric-snapshot uniqueness constraint.
+
 ## Platform adapter framework
 
 - `PlatformAdapter` is the provider-neutral protocol for account lifecycle,

@@ -182,6 +182,18 @@ def create_metric(
 ) -> VideoMetric:
     video = get_video(db, video_id, workspace_id=workspace_id)
 
+    if payload.captured_at is not None:
+        existing = db.scalar(
+            select(VideoMetric)
+            .options(*ANALYTICS_LOAD_OPTIONS)
+            .where(
+                VideoMetric.video_id == video_id,
+                VideoMetric.captured_at == payload.captured_at,
+            )
+        )
+        if existing is not None:
+            return existing
+
     values = payload.model_dump(
         exclude={"captured_at", *NESTED_ANALYTICS_FIELDS}
     )
@@ -228,6 +240,20 @@ def create_metric(
     try:
         db.commit()
         db.refresh(metric)
+    except IntegrityError as exc:
+        db.rollback()
+        if payload.captured_at is not None:
+            concurrent = db.scalar(
+                select(VideoMetric)
+                .options(*ANALYTICS_LOAD_OPTIONS)
+                .where(
+                    VideoMetric.video_id == video_id,
+                    VideoMetric.captured_at == payload.captured_at,
+                )
+            )
+            if concurrent is not None:
+                return concurrent
+        raise ConflictError("A metric snapshot already exists") from exc
     except SQLAlchemyError as exc:
         db.rollback()
         raise PersistenceError("Unable to save video metric") from exc

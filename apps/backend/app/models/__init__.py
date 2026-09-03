@@ -8,6 +8,7 @@ from app.models.analytics import (
     VideoTrafficSource,
     YouTubeMetricExtension,
 )
+from app.models.analytics_sync import AnalyticsSyncRun, AnalyticsSyncStatus
 from app.models.auth_session import AuthSession
 from app.models.auth_throttle import AuthThrottle
 from app.models.channel import Channel, Platform
@@ -55,6 +56,8 @@ __all__ = [
     "AuthThrottle",
     "ActivityEvent",
     "ActivityType",
+    "AnalyticsSyncRun",
+    "AnalyticsSyncStatus",
     "ApprovalRequest",
     "ApprovalStatus",
     "Channel",

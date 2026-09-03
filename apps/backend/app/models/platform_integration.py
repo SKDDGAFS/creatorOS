@@ -23,6 +23,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.analytics_sync import AnalyticsSyncRun
     from app.models.user import User
     from app.models.workspace import Workspace
 
@@ -144,6 +145,11 @@ class PlatformConnection(Base):
     account_metric_snapshots: Mapped[
         list[PlatformAccountMetricSnapshot]
     ] = relationship(
+        back_populates="connection",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    analytics_sync_runs: Mapped[list[AnalyticsSyncRun]] = relationship(
         back_populates="connection",
         cascade="save-update, merge",
         passive_deletes=True,

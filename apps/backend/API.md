@@ -239,6 +239,37 @@ The typed handler registry executes one claimed job at a time and cannot run
 shell commands. Platform and publishing workers will register domain-specific
 handlers in later sprints.
 
+## Analytics synchronization
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/analytics-sync/schedule` | Schedule one run per selected connected account |
+| `GET` | `/api/analytics-sync/runs` | List workspace sync runs |
+| `GET` | `/api/analytics-sync/runs/{id}` | Read one workspace sync run |
+| `GET` | `/api/analytics-sync/health` | Read the latest health state for every connection |
+
+Scheduling requires workspace write access, CSRF validation, and an
+`Idempotency-Key` header containing 8 through 200 characters. An empty
+`connection_ids` list schedules every connected account in the active
+workspace. A supplied ID that is missing, disconnected, or owned by another
+workspace returns `404` without revealing which condition applied.
+
+Each connection receives a typed `analytics.sync_connection` durable job and a
+linked run record. The worker synchronizes the active channel, one video page,
+account metrics where supported, and video metrics. Existing inactive channels
+are skipped without contacting the provider. Provider cursors advance only
+after the associated data is stored.
+
+Runs expose counts, safe status, timestamps, and redacted error fields. Rate
+limits and temporary persistence failures use the durable queue's retry policy.
+Credential, authorization, invalid-data, and missing-resource failures are
+terminal. Activity events record scheduling, start, retry, failure, success, or
+skip without storing provider responses or credentials.
+
+Video metric snapshots are unique by video and capture time. Replaying an
+adapter page returns the existing snapshot, which keeps worker retries
+idempotent while preserving append-only history.
+
 ## Platform adapter framework
 
 The adapter framework is the internal provider boundary. YouTube, Instagram,
@@ -372,6 +403,6 @@ See `../../docs/TIKTOK_SETUP.md` for setup and provider restrictions.
 - `404`: resource absent from the active workspace
 - `409`: uniqueness conflict
 - `422`: invalid request data
-- `429`: login throttle active
+- `429`: login throttle active or a connected provider rate limit
 
 Raw database exceptions and credential-enumeration details are not returned.

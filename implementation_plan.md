@@ -523,3 +523,54 @@ No migration is planned: Sprint J reuses the existing platform connection, accou
 - Test OAuth state, scope gating, refresh, pagination, mappings, nullable unavailable metrics, publishing validation/status, error classification, disconnect, authorization, and workspace isolation.
 - Run Pytest, Ruff, Mypy, Alembic current/drift/offline checks, secret scanning, dependency verification, and `git diff --check`.
 - Commit, push, and open a stacked draft pull request without merging.
+
+# Sprint K implementation plan: analytics worker
+
+## Scope
+
+1. Add `AnalyticsSyncRun` records linked one-to-one with durable jobs and scoped
+   to a workspace and platform connection.
+2. Expose idempotent scheduling, run history, individual run reads, and
+   per-connection health through authorized APIs.
+3. Register a context-aware `analytics.sync_connection` handler while preserving
+   the existing payload-only job-handler API.
+4. Synchronize an active channel, one cursor-paginated video page, supported
+   account metrics, and all known video metrics through the existing provider
+   services.
+5. Skip locally inactive channels before loading credentials or contacting a
+   provider.
+6. Convert rate limits and temporary persistence failures into safe retries;
+   treat invalid, unavailable, unauthorized, or missing connections as terminal.
+7. Make video metric snapshots unique by video and capture time so replaying a
+   page cannot duplicate analytics.
+8. Expand the activity timeline with scheduled, started, retry, failed,
+   succeeded, and skipped synchronization events.
+
+## Safety and verification
+
+- Durable-job payloads contain a connection UUID only. Credentials remain behind
+  the existing secret-store boundary.
+- Every schedule, run, and health query is workspace scoped. Scheduling requires
+  a writable membership and CSRF validation.
+- Provider response bodies and raw exception messages never enter run records,
+  job errors, or activity events.
+- Cursor writes remain downstream of successful data writes. Failed pages keep
+  their prior cursor and can be retried.
+- Revision `0011` adds sync runs, the metric uniqueness constraint, and expanded
+  activity types.
+- Test idempotent scheduling, worker success, snapshot deduplication, cursor
+  progress, inactive-channel skipping, safe rate-limit retry, activity events,
+  health, authorization, and workspace isolation with fake adapters only.
+
+## Verification result
+
+- Ruff, mypy, and all 93 backend tests pass.
+- Dashboard lint, TypeScript checking, and the production build pass.
+- Python dependency auditing reports no known vulnerabilities. The frontend
+  high-severity advisory was removed with a compatible lockfile update; three
+  moderate PostCSS advisories remain because the available fix requires a
+  forced Next.js upgrade outside the declared dependency range.
+- Alembic identifies `0011` as the single head and renders the complete offline
+  upgrade SQL successfully.
+- Live PostgreSQL migration, schema-drift, and Compose checks remain pending
+  because Docker is not installed in this environment.
