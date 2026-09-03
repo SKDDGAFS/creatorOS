@@ -242,6 +242,28 @@ API examples and the complete route list are documented in `API.md`.
 - Revision `0011` adds analytics sync runs, expands activity-event types, and
   adds the metric-snapshot uniqueness constraint.
 
+## AI provider router
+
+- `AIProviderConfiguration` stores workspace-owned endpoint metadata, model
+  selection, capability tier, retry policy, priority, and administrator-supplied
+  price estimates. It never stores a secret value.
+- `AIPromptVersion` is immutable and workspace scoped. Creating a new version
+  deactivates the previous active version with the same name.
+- `AIUsageBudget` sets optional monthly token and estimated-cost ceilings.
+  `AIInvocation` records the chosen provider/model, prompt version, attempts,
+  schema-validated result, token counts, cost estimate, and safe failures.
+- `ai_service.generate_structured` renders bounded templates, selects providers
+  by tier and priority, performs budget preflight, retries transient failures,
+  falls back, validates the result with the caller's Pydantic model, and reuses
+  successful idempotent results.
+- `OllamaProvider` supplies the free local path. `OpenAICompatibleProvider`
+  supports optional local or allowlisted HTTPS endpoints. Both sit behind the
+  same typed contract and have mocked transport tests.
+- The API manages configurations, prompt versions, budgets, health, usage, and
+  invocation history. It intentionally does not expose arbitrary prompt
+  execution to browsers.
+- Revision `0012` adds the four AI routing and accounting tables.
+
 ## Platform adapter framework
 
 - `PlatformAdapter` is the provider-neutral protocol for account lifecycle,

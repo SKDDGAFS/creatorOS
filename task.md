@@ -156,3 +156,20 @@
 - [ ] Apply migration `0011`, run schema drift, and validate Compose against a
   live PostgreSQL instance when Docker is available.
 - [ ] Commit, push, and open a stacked draft pull request without merging.
+
+## Sprint L: AI provider router
+
+- [x] Add workspace-owned Ollama and OpenAI-compatible provider configuration.
+- [x] Keep optional API keys behind environment references and out of responses.
+- [x] Add immutable active prompt versions and safe template rendering.
+- [x] Add tier/priority selection, retry, and provider fallback.
+- [x] Require schema-validated structured model output.
+- [x] Add monthly token/cost budgets and usage summaries.
+- [x] Add idempotent invocation history with safe failure records.
+- [x] Add provider, prompt, budget, health, usage, and history APIs.
+- [x] Add revision `0012`, mocked provider tests, and setup documentation.
+- [x] Run backend and dashboard quality, offline migration, dependency, diff,
+  and secret checks.
+- [ ] Apply migration `0012`, run schema drift, and validate Compose against a
+  live PostgreSQL instance when Docker is available.
+- [ ] Commit, push, and open a stacked draft pull request without merging.

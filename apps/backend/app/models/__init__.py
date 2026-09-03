@@ -1,3 +1,12 @@
+from app.models.ai import (
+    AICapabilityTier,
+    AIInvocation,
+    AIInvocationStatus,
+    AIPromptVersion,
+    AIProviderConfiguration,
+    AIProviderKind,
+    AIUsageBudget,
+)
 from app.models.analytics import (
     InstagramMetricExtension,
     TikTokMetricExtension,
@@ -56,6 +65,13 @@ __all__ = [
     "AuthThrottle",
     "ActivityEvent",
     "ActivityType",
+    "AICapabilityTier",
+    "AIInvocation",
+    "AIInvocationStatus",
+    "AIPromptVersion",
+    "AIProviderConfiguration",
+    "AIProviderKind",
+    "AIUsageBudget",
     "AnalyticsSyncRun",
     "AnalyticsSyncStatus",
     "ApprovalRequest",

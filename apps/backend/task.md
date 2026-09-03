@@ -127,3 +127,17 @@
   secret verification.
 - [ ] Apply migration `0011` and run the live PostgreSQL schema drift check when
   Docker is available.
+
+# AI provider router checklist
+
+- [x] Add provider-neutral structured generation contracts.
+- [x] Add local Ollama and optional OpenAI-compatible transports.
+- [x] Add workspace provider configuration and SSRF-safe URL policy.
+- [x] Add versioned prompts and a constrained renderer.
+- [x] Add retries, fallback, schema validation, and idempotent result reuse.
+- [x] Add token/cost budgets, usage records, and health checks.
+- [x] Add authorized management and observability APIs.
+- [x] Add migration `0012`, mocked tests, and documentation.
+- [x] Complete tests, lint, typing, dependency, offline migration, diff, and
+  secret verification.
+- [ ] Apply migration `0012` and run live schema drift when Docker is available.

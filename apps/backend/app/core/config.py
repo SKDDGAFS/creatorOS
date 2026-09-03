@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     )
     tiktok_enable_publishing: bool = False
     tiktok_http_timeout_seconds: float = 30.0
+    ai_allowed_provider_hosts: str = ""
+    ai_allowed_local_provider_hosts: str = ""
+    ai_max_input_characters: int = 100_000
 
     @field_validator(
         "youtube_client_id",
@@ -108,6 +111,8 @@ class Settings(BaseSettings):
             raise ValueError("INSTAGRAM_HTTP_TIMEOUT_SECONDS must be positive")
         if self.tiktok_http_timeout_seconds <= 0:
             raise ValueError("TIKTOK_HTTP_TIMEOUT_SECONDS must be positive")
+        if not 1_000 <= self.ai_max_input_characters <= 1_000_000:
+            raise ValueError("AI_MAX_INPUT_CHARACTERS must be between 1000 and 1000000")
         if re.fullmatch(r"v[1-9][0-9]*\.0", self.instagram_api_version) is None:
             raise ValueError("INSTAGRAM_API_VERSION must look like v23.0")
         if not 1 <= self.oauth_state_ttl_minutes <= 60:
@@ -117,6 +122,22 @@ class Settings(BaseSettings):
                 "YOUTUBE_ANALYTICS_LOOKBACK_DAYS must be between 1 and 3650"
             )
         return self
+
+    @property
+    def allowed_ai_provider_hosts(self) -> frozenset[str]:
+        return frozenset(
+            host.strip().lower().rstrip(".")
+            for host in self.ai_allowed_provider_hosts.split(",")
+            if host.strip()
+        )
+
+    @property
+    def allowed_local_ai_provider_hosts(self) -> frozenset[str]:
+        return frozenset(
+            host.strip().lower().rstrip(".")
+            for host in self.ai_allowed_local_provider_hosts.split(",")
+            if host.strip()
+        )
 
 
 @lru_cache

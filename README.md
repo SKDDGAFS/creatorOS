@@ -29,6 +29,9 @@ The repository contains:
 - a durable analytics worker with idempotent scheduling, provider cursor reuse,
   append-only metric synchronization, safe retries, activity events, and
   workspace-scoped health reporting;
+- a provider-neutral AI router with a free local Ollama path, optional
+  OpenAI-compatible endpoints, versioned prompts, validated structured output,
+  fallback, token/cost budgets, health checks, and usage history;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -114,4 +117,5 @@ npm audit --audit-level=high
 Architecture details are in `apps/backend/system_architecture.md`; API behavior
 is documented in `apps/backend/API.md`. The roadmap for turning Codex's local
 development skills into reviewed CreatorOS capabilities is in
-`docs/SKILLS_INTEGRATION_PLAN.md`.
+`docs/SKILLS_INTEGRATION_PLAN.md`. Local and optional AI provider setup is in
+`docs/AI_PROVIDERS.md`.

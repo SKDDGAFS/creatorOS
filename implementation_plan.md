@@ -574,3 +574,51 @@ No migration is planned: Sprint J reuses the existing platform connection, accou
   upgrade SQL successfully.
 - Live PostgreSQL migration, schema-drift, and Compose checks remain pending
   because Docker is not installed in this environment.
+
+# Sprint L implementation plan: AI provider router
+
+## Scope
+
+1. Add workspace-owned provider configurations for loopback Ollama and optional
+   OpenAI-compatible endpoints.
+2. Keep credentials outside SQL through explicit `env://VARIABLE_NAME`
+   references and omit those references from API responses.
+3. Add immutable prompt versions with one active version per prompt name and a
+   constrained simple-field template renderer.
+4. Route structured generation by minimum capability tier and descending
+   priority, with bounded provider retries and fallback.
+5. Convert caller Pydantic models to JSON Schema and validate every provider
+   result before it is persisted or returned.
+6. Add monthly workspace token and estimated-cost budgets with conservative
+   preflight estimation and provider-reported usage records.
+7. Add request fingerprints and hashed idempotency keys so a successful
+   generation can be reused without another provider call.
+8. Expose authorized configuration, prompt, budget, health, usage, and
+   invocation-history APIs while keeping arbitrary generation off the browser
+   surface.
+
+## Safety and verification
+
+- Ollama must use loopback. Remote compatible endpoints require HTTPS and an
+  explicit hostname allowlist; redirects and URL credentials are rejected.
+- Prompt variables are bounded and excluded from SQL. Raw provider bodies and
+  raw exception messages are excluded from failure records.
+- Basic local development requires no API key and tests never contact a model.
+- Revision `0012` adds provider configurations, prompt versions, workspace
+  budgets, and invocation records with named constraints and rollback support.
+- Test URL restrictions, workspace isolation, prompt activation, retries,
+  fallback, output validation, idempotency, budgets, safe failures, transport
+  payloads, token accounting, and health through fake providers and mock HTTP.
+
+## Verification result
+
+- Ruff, mypy, and all 100 backend tests pass.
+- Dashboard lint, TypeScript checking, and the production build pass.
+- Python dependency auditing reports no known vulnerabilities. The existing
+  three moderate PostCSS advisories remain; the available npm fix requires a
+  forced Next.js upgrade outside the declared dependency range.
+- Alembic identifies `0012` as the single head and renders the complete offline
+  upgrade SQL successfully.
+- Diff and secret-pattern checks pass after staged-file review.
+- Live PostgreSQL migration, schema-drift, and Compose checks remain pending
+  because Docker is not installed in this environment.

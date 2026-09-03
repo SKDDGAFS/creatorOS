@@ -108,3 +108,23 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - Cursor updates follow successful data writes. Metric snapshot uniqueness makes
   retrying a previously stored page safe.
 - The worker uses typed Python callables and has no shell-execution capability.
+
+## AI provider boundary
+
+- The browser has no arbitrary prompt-execution route. Trusted backend workers
+  select named prompt versions and typed output models.
+- Ollama is restricted to loopback or explicitly configured local hostnames.
+  Remote compatible providers require HTTPS and an explicit hostname allowlist,
+  reducing SSRF exposure.
+- Provider redirects are disabled. URLs with embedded credentials, queries, or
+  fragments are rejected, environment proxy settings are ignored, and response
+  bodies are capped before parsing.
+- Optional API keys use `env://VARIABLE_NAME` references. Key material remains
+  in the backend environment and is excluded from API responses and SQL.
+- Prompt variables are bounded and are not stored. Output must pass the caller's
+  Pydantic schema before it can be returned or persisted.
+- Raw provider responses and exception details are never written to failure
+  records. Stored error messages come from a fixed safe mapping.
+- Workspace token and cost budgets are checked before a provider call. Model
+  output remains untrusted and cannot bypass authorization or publishing
+  approval.

@@ -16,6 +16,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.ai import (
+        AIInvocation,
+        AIPromptVersion,
+        AIProviderConfiguration,
+        AIUsageBudget,
+    )
     from app.models.analytics_sync import AnalyticsSyncRun
     from app.models.channel import Channel
     from app.models.durable_job import DurableJob
@@ -85,6 +91,25 @@ class Workspace(Base):
         passive_deletes=True,
     )
     analytics_sync_runs: Mapped[list[AnalyticsSyncRun]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_providers: Mapped[list[AIProviderConfiguration]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_prompt_versions: Mapped[list[AIPromptVersion]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_usage_budget: Mapped[AIUsageBudget | None] = relationship(
+        back_populates="workspace",
+        uselist=False,
+    )
+    ai_invocations: Mapped[list[AIInvocation]] = relationship(
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.ai import AIInvocation, AIPromptVersion, AIProviderConfiguration
     from app.models.auth_session import AuthSession
     from app.models.channel import Channel
     from app.models.durable_job import DurableJob
@@ -83,6 +84,21 @@ class User(Base):
     )
     platform_connections_created: Mapped[list[PlatformConnection]] = relationship(
         back_populates="created_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_providers_created: Mapped[list[AIProviderConfiguration]] = relationship(
+        back_populates="created_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_prompt_versions_created: Mapped[list[AIPromptVersion]] = relationship(
+        back_populates="created_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    ai_invocations: Mapped[list[AIInvocation]] = relationship(
+        back_populates="requested_by",
         cascade="save-update, merge",
         passive_deletes=True,
     )

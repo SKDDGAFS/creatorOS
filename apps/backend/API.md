@@ -270,6 +270,37 @@ Video metric snapshots are unique by video and capture time. Replaying an
 adapter page returns the existing snapshot, which keeps worker retries
 idempotent while preserving append-only history.
 
+## AI provider management
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/ai/providers` | Create a workspace provider configuration |
+| `GET` | `/api/ai/providers` | List enabled or all provider configurations |
+| `POST` | `/api/ai/providers/{id}/disable` | Disable a provider configuration |
+| `GET` | `/api/ai/health` | Check enabled provider health |
+| `POST` | `/api/ai/prompts` | Create and activate an immutable prompt version |
+| `GET` | `/api/ai/prompts` | List workspace prompt versions |
+| `PUT` | `/api/ai/budget` | Set monthly token/cost limits and output defaults |
+| `GET` | `/api/ai/usage` | Read the current month's usage |
+| `GET` | `/api/ai/invocations` | List schema-validated generation records |
+
+Provider and budget mutations require workspace administrator access; prompt
+creation requires workspace write access. All writes require CSRF validation,
+and all reads are restricted to the active workspace. Provider responses omit
+credential references.
+
+Ollama configurations accept loopback HTTP by default and cannot use
+credentials. An exact host bridge can be opted in through
+`AI_ALLOWED_LOCAL_PROVIDER_HOSTS`. Remote OpenAI-compatible URLs require HTTPS
+plus an explicit `AI_ALLOWED_PROVIDER_HOSTS` entry. Optional credentials are
+backend environment references such as `env://LOCAL_MODEL_KEY`; secret values
+are never stored.
+
+Generation is an internal typed service for controlled workers, not an
+arbitrary browser endpoint. It uses an active prompt version, schema-validates
+the result, applies retry and fallback rules, enforces workspace budgets, and
+records usage. See `../../docs/AI_PROVIDERS.md` for setup and limitations.
+
 ## Platform adapter framework
 
 The adapter framework is the internal provider boundary. YouTube, Instagram,

@@ -10,7 +10,7 @@ stay behind typed interfaces and remain disabled until the user configures them.
 
 | Development skill | CreatorOS capability | Sprint | Local foundation | Main safeguards | Status |
 | --- | --- | --- | --- | --- | --- |
-| `token-optimization` | Token budgets, context compaction, model routing, and prompt versions | L–M | Local model runner and deterministic test doubles | Preserve system and permission rules during compaction; record usage per run | Planned |
+| `token-optimization` | Token budgets, context compaction, model routing, and prompt versions | L–M | Local model runner and deterministic test doubles | Preserve system and permission rules during compaction; record usage per run | Router and budgets implemented |
 | `humanize-writing`, `copywriting`, `copy-editing` | Brand-aware scripts, captions, copy generation, and revision | M, O, R | Versioned text artifacts and local models | Preserve facts and sources; validate output; require publishing approval | Planned |
 | `content-strategy`, `social` | Content pillars, calendars, hooks, repurposing, and platform variants | N–R | Local planning services | Keep evidence, uncertainty, workspace ownership, and version history | Planned |
 | `ad-creative` | Creative briefs, ad variants, and experiments | O, Q, R | Template-driven local generation | Separate claims from evidence; require review before export or publishing | Planned |
