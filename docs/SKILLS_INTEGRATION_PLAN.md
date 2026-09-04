@@ -10,8 +10,8 @@ stay behind typed interfaces and remain disabled until the user configures them.
 
 | Development skill | CreatorOS capability | Sprint | Local foundation | Main safeguards | Status |
 | --- | --- | --- | --- | --- | --- |
-| `token-optimization` | Token budgets, context compaction, model routing, and prompt versions | L–M | Local model runner and deterministic test doubles | Preserve system and permission rules during compaction; record usage per run | Router and budgets implemented |
-| `humanize-writing`, `copywriting`, `copy-editing` | Brand-aware scripts, captions, copy generation, and revision | M, O, R | Versioned text artifacts and local models | Preserve facts and sources; validate output; require publishing approval | Planned |
+| `token-optimization` | Token budgets, context compaction, model routing, and prompt versions | L–M | Local model runner and deterministic test doubles | Preserve system and permission rules during compaction; record usage per run | Router, budgets, and bounded agent implemented |
+| `humanize-writing`, `copywriting`, `copy-editing` | Brand-aware scripts, captions, copy generation, and revision | M, O, R | Versioned text artifacts and local models | Preserve facts and sources; validate output; require publishing approval | Bounded copywriter agent implemented; artifact workflow planned |
 | `content-strategy`, `social` | Content pillars, calendars, hooks, repurposing, and platform variants | N–R | Local planning services | Keep evidence, uncertainty, workspace ownership, and version history | Planned |
 | `ad-creative` | Creative briefs, ad variants, and experiments | O, Q, R | Template-driven local generation | Separate claims from evidence; require review before export or publishing | Planned |
 | `faster-whisper-transcriber` | Arabic, English, and mixed-language transcription | R, U | Faster-Whisper and FFmpeg | Local-first processing, bounded files, safe paths, explicit external-provider consent | Planned |
@@ -23,11 +23,11 @@ stay behind typed interfaces and remain disabled until the user configures them.
 
 ## Runtime capability boundary
 
-Sprint M should introduce a typed capability registry for CreatorOS agents. Each
-entry needs an input schema, output schema, allowed agent types, workspace
-authorization rule, timeout, usage budget, activity record, and approval policy.
-Agents must not execute arbitrary shell commands or turn imported text into
-instructions.
+Sprint M introduced a typed capability registry for CreatorOS agents. Each run
+has a bounded input schema, strict output schema, closed agent type, workspace
+authorization rule, durable retry policy, AI budget enforcement, and activity
+record. Registry entries cannot publish or execute shell commands. Imported
+references remain data and do not become instructions or capabilities.
 
 ## Media pipeline boundary
 

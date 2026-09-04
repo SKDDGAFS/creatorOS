@@ -16,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.agent_run import AgentRun
     from app.models.ai import (
         AIInvocation,
         AIPromptVersion,
@@ -110,6 +111,11 @@ class Workspace(Base):
         uselist=False,
     )
     ai_invocations: Mapped[list[AIInvocation]] = relationship(
+        back_populates="workspace",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    agent_runs: Mapped[list[AgentRun]] = relationship(
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,

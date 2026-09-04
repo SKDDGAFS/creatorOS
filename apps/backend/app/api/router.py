@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routes.agent_runs import router as agent_runs_router
 from app.api.routes.ai import router as ai_router
 from app.api.routes.analytics_sync import router as analytics_sync_router
 from app.api.routes.auth import router as auth_router
@@ -16,6 +17,7 @@ api_router = APIRouter(prefix="/api")
 api_router.include_router(health_router)
 api_router.include_router(auth_router)
 api_router.include_router(workspaces_router)
+api_router.include_router(agent_runs_router)
 api_router.include_router(ai_router)
 api_router.include_router(analytics_sync_router)
 api_router.include_router(growth_signals_router)

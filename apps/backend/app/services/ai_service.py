@@ -303,6 +303,23 @@ def get_active_prompt(
     return prompt
 
 
+def get_prompt_version(
+    db: Session,
+    *,
+    workspace_id: UUID,
+    prompt_version_id: UUID,
+) -> AIPromptVersion:
+    prompt = db.scalar(
+        select(AIPromptVersion).where(
+            AIPromptVersion.id == prompt_version_id,
+            AIPromptVersion.workspace_id == workspace_id,
+        )
+    )
+    if prompt is None:
+        raise ResourceNotFoundError("AI prompt version not found")
+    return prompt
+
+
 def upsert_usage_budget(
     db: Session,
     *,
@@ -552,6 +569,7 @@ def generate_structured[AIOutput: BaseModel](
     workspace_id: UUID,
     user_id: UUID,
     prompt_name: str,
+    prompt_version_id: UUID | None = None,
     variables: Mapping[str, str],
     output_type: type[AIOutput],
     idempotency_key: str,
@@ -571,11 +589,21 @@ def generate_structured[AIOutput: BaseModel](
     total_characters = sum(len(value) for value in variables.values())
     if total_characters > resolved_settings.ai_max_input_characters:
         raise InvalidRequestError("AI prompt input exceeds the configured limit")
-    prompt = get_active_prompt(
-        db,
-        workspace_id=workspace_id,
-        name=prompt_name,
+    prompt = (
+        get_prompt_version(
+            db,
+            workspace_id=workspace_id,
+            prompt_version_id=prompt_version_id,
+        )
+        if prompt_version_id is not None
+        else get_active_prompt(
+            db,
+            workspace_id=workspace_id,
+            name=prompt_name,
+        )
     )
+    if prompt.name != prompt_name:
+        raise InvalidRequestError("AI prompt version does not match the prompt name")
     budget = get_usage_budget(db, workspace_id=workspace_id)
     output_limit = max_output_tokens or (
         budget.default_max_output_tokens if budget else 2048

@@ -37,12 +37,12 @@ def upgrade() -> None:
         ["video_id", "captured_at"],
     )
     op.drop_constraint(
-        "ck_activity_events_event_type_allowed",
+        op.f("ck_activity_events_event_type_allowed"),
         "activity_events",
         type_="check",
     )
     op.create_check_constraint(
-        "ck_activity_events_event_type_allowed",
+        op.f("ck_activity_events_event_type_allowed"),
         "activity_events",
         f"event_type IN ({NEW_ACTIVITY_TYPES})",
     )
@@ -199,12 +199,12 @@ def downgrade() -> None:
     )
     op.drop_table("analytics_sync_runs")
     op.drop_constraint(
-        "ck_activity_events_event_type_allowed",
+        op.f("ck_activity_events_event_type_allowed"),
         "activity_events",
         type_="check",
     )
     op.create_check_constraint(
-        "ck_activity_events_event_type_allowed",
+        op.f("ck_activity_events_event_type_allowed"),
         "activity_events",
         f"event_type IN ({OLD_ACTIVITY_TYPES})",
     )

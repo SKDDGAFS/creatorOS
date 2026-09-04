@@ -437,3 +437,31 @@ See `../../docs/TIKTOK_SETUP.md` for setup and provider restrictions.
 - `429`: login throttle active or a connected provider rate limit
 
 Raw database exceptions and credential-enumeration details are not returned.
+
+## Agent runs
+
+Agent runs are workspace-owned durable jobs that produce validated
+recommendations. They never publish content or execute shell commands.
+
+```text
+GET    /api/agent-runs/capabilities
+POST   /api/agent-runs
+GET    /api/agent-runs
+GET    /api/agent-runs/{run_id}
+POST   /api/agent-runs/{run_id}/cancel
+```
+
+The create route requires write access, CSRF, and an `Idempotency-Key` header.
+It accepts an agent type, objective, up to 100 typed resource references,
+priority, and maximum attempts. The active prompt for the selected capability
+must already exist. Scheduling captures its immutable version ID.
+
+List and detail reads require membership in the selected workspace. List
+filters include agent type and status. Cancellation requires owner/admin access
+and cannot cancel a completed durable job. Capability discovery is read-only
+and reports that every registered agent has `can_publish=false` and
+`can_execute_shell=false`.
+
+Successful responses expose the chosen model, estimated cost, strict structured
+output, and confidence. Failed responses expose fixed safe errors only. See
+`../../docs/AGENT_RUNS.md` for prompt fields and worker registration.

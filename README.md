@@ -32,6 +32,9 @@ The repository contains:
 - a provider-neutral AI router with a free local Ollama path, optional
   OpenAI-compatible endpoints, versioned prompts, validated structured output,
   fallback, token/cost budgets, health checks, and usage history;
+- a controlled agent-run framework with immutable prompt selection, typed
+  recommendation output, durable retries, cost/confidence records, and no
+  publishing or shell capability;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -119,3 +122,5 @@ is documented in `apps/backend/API.md`. The roadmap for turning Codex's local
 development skills into reviewed CreatorOS capabilities is in
 `docs/SKILLS_INTEGRATION_PLAN.md`. Local and optional AI provider setup is in
 `docs/AI_PROVIDERS.md`.
+Agent capabilities, prompt contracts, scheduling, and worker registration are
+documented in `docs/AGENT_RUNS.md`.

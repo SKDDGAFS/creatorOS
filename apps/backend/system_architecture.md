@@ -400,3 +400,18 @@ measurements.
   explicit privacy choice. Runtime media dispatch remains disabled until the
   authorized media-store boundary is implemented. Tests inject a fake transport
   and never contact TikTok.
+## Controlled agent runs
+
+`AgentRun` is the auditable bridge between product workflows, immutable AI
+prompts, AI usage records, and the durable job queue. Scheduling resolves a
+closed registry capability and stores the exact active `AIPromptVersion` before
+enqueueing `agent.run`. Execution loads that version by ID, routes through the
+workspace AI provider policy, validates `AgentRunOutput`, then links the
+successful `AIInvocation` and records model, cost, confidence, timestamps, and
+activity events.
+
+The worker receives no shell, publishing, messaging, or browser capability.
+Input references are workspace-validated typed IDs serialized into a bounded
+prompt variable. The output contract is advisory and cannot mutate publishing
+state. Workspace IDs are checked on every schedule, lookup, list,
+cancellation, and worker join.

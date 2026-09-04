@@ -128,3 +128,19 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - Workspace token and cost budgets are checked before a provider call. Model
   output remains untrusted and cannot bypass authorization or publishing
   approval.
+
+## Agent-run boundary
+
+- The agent registry is closed to typed recommendation capabilities. It rejects
+  publishing and arbitrary shell execution.
+- Scheduling stores an immutable prompt-version ID and requires workspace write
+  access, CSRF validation, and a hashed durable-job idempotency key.
+- Worker output must satisfy the strict recommendation schema before storage.
+  It cannot create or approve a publishing transition.
+- Input references are bounded resource identifiers and labels, and each must
+  resolve inside the active workspace. Referenced or imported content remains
+  untrusted data and cannot expand the worker's tools.
+- Run, invocation, job, and activity records are workspace scoped. Cancellation
+  requires an owner or administrator.
+- Raw provider responses and exception details are converted to safe messages
+  before they reach run or activity records.

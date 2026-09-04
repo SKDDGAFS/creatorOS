@@ -27,6 +27,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.agent_run import AgentRun
     from app.models.user import User
     from app.models.workspace import Workspace
 
@@ -214,6 +215,11 @@ class AIPromptVersion(Base):
         cascade="save-update, merge",
         passive_deletes=True,
     )
+    agent_runs: Mapped[list[AgentRun]] = relationship(
+        back_populates="prompt_version",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
 
 
 class AIUsageBudget(Base):
@@ -355,3 +361,7 @@ class AIInvocation(Base):
     )
     prompt_version: Mapped[AIPromptVersion] = relationship(back_populates="invocations")
     requested_by: Mapped[User] = relationship(back_populates="ai_invocations")
+    agent_run: Mapped[AgentRun | None] = relationship(
+        back_populates="ai_invocation",
+        uselist=False,
+    )

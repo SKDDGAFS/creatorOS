@@ -23,6 +23,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.agent_run import AgentRun
     from app.models.analytics_sync import AnalyticsSyncRun
     from app.models.user import User
     from app.models.workspace import Workspace
@@ -175,6 +176,10 @@ class DurableJob(Base):
         order_by="JobAttempt.attempt_number",
     )
     analytics_sync_run: Mapped[AnalyticsSyncRun | None] = relationship(
+        back_populates="durable_job",
+        uselist=False,
+    )
+    agent_run: Mapped[AgentRun | None] = relationship(
         back_populates="durable_job",
         uselist=False,
     )

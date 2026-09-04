@@ -622,3 +622,41 @@ No migration is planned: Sprint J reuses the existing platform connection, accou
 - Diff and secret-pattern checks pass after staged-file review.
 - Live PostgreSQL migration, schema-drift, and Compose checks remain pending
   because Docker is not installed in this environment.
+
+# Sprint M implementation plan: agent-run framework
+
+## Scope
+
+1. Add workspace-owned agent runs linked to the requester, exact immutable
+   prompt version, durable job, optional successful AI invocation, and activity
+   timeline.
+2. Record the agent type, objective, typed input references, lifecycle,
+   selected model, estimated cost, validated output, confidence, and safe error.
+3. Add a closed capability registry for content strategy, copywriting, social
+   planning, video analysis, and token optimization.
+4. Reject any registry capability that can publish or execute arbitrary shell
+   commands; keep every output advisory.
+5. Schedule `agent.run` durably with hashed idempotency, bounded priority and
+   retries, workspace authorization, and CSRF protection.
+6. Resolve the active prompt at schedule time and execute that exact version,
+   even when another version becomes active before the worker runs.
+7. Route execution through the provider-neutral AI layer and validate a strict
+   recommendation schema before recording success.
+8. Expose capability discovery, scheduling, filtered history, run detail, and
+   administrator cancellation without exposing arbitrary generation.
+
+## Safety and verification
+
+- The local Ollama route remains free and requires no paid API key. Tests use
+  deterministic fake providers and make no model or platform calls.
+- Input references are bounded typed identifiers. Imported content cannot alter
+  permissions or grant tools.
+- Raw provider details are normalized before storage in run, durable-job, or
+  activity records.
+- Revision `0013` adds agent runs, direct activity linkage, fixed lifecycle/type
+  constraints, indexes, and downgrade support.
+- Ruff passes, mypy passes across 106 source files, and all 105 backend tests
+  pass. Alembic reports `0013` as the single head and renders complete offline
+  PostgreSQL upgrade SQL.
+- Live PostgreSQL migration, schema-drift, and Compose checks remain pending
+  because Docker is not installed in this environment.

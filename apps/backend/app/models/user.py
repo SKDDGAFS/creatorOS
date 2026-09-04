@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.agent_run import AgentRun
     from app.models.ai import AIInvocation, AIPromptVersion, AIProviderConfiguration
     from app.models.auth_session import AuthSession
     from app.models.channel import Channel
@@ -98,6 +99,11 @@ class User(Base):
         passive_deletes=True,
     )
     ai_invocations: Mapped[list[AIInvocation]] = relationship(
+        back_populates="requested_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    agent_runs_requested: Mapped[list[AgentRun]] = relationship(
         back_populates="requested_by",
         cascade="save-update, merge",
         passive_deletes=True,

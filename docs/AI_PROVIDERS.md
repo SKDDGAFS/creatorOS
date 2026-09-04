@@ -95,7 +95,8 @@ counts and cost estimates are recorded after a successful call.
 - Provider prices are administrator-supplied estimates; CreatorOS does not
   query billing systems.
 - Local models are not bundled or downloaded automatically.
-- Model output remains untrusted data. Sprint M agents must keep schema,
-  authorization, and approval checks between generated output and any action.
+- Model output remains untrusted data. Agent runs validate a fixed output
+  contract and can only recommend or prepare work; they cannot publish or run
+  shell commands.
 - Tests use mock transports and deterministic fake providers. They do not call a
   model or paid API.

@@ -141,3 +141,23 @@
 - [x] Complete tests, lint, typing, dependency, offline migration, diff, and
   secret verification.
 - [ ] Apply migration `0012` and run live schema drift when Docker is available.
+
+# Agent-run framework checklist
+
+- [x] Add a closed registry for strategy, copy, social, video-analysis, and
+  token-optimization agents.
+- [x] Enforce recommendation-only capabilities with no publishing or shell
+  execution.
+- [x] Add workspace-owned agent runs linked to an exact prompt version, durable
+  job, optional AI invocation, requester, and activity events.
+- [x] Record objective, typed input references, status, timestamps, model,
+  estimated cost, strict output, confidence, and safe errors.
+- [x] Add idempotent scheduling, filtered history, detail, capability, and
+  administrator cancellation APIs.
+- [x] Add a durable worker with AI routing, schema validation, safe retry, and
+  prompt-version reproducibility.
+- [x] Add migration `0013`, fake-provider tests, and security/API/operations
+  documentation.
+- [x] Complete 105 tests, lint, typing, offline migration, and diff checks.
+- [ ] Apply migration `0013` and run live PostgreSQL schema drift when Docker is
+  available.

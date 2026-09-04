@@ -1,3 +1,4 @@
+from app.models.agent_run import AgentRun, AgentRunStatus, AgentType
 from app.models.ai import (
     AICapabilityTier,
     AIInvocation,
@@ -61,6 +62,9 @@ from app.models.video_metric import VideoMetric
 from app.models.workspace import Workspace, WorkspaceMembership, WorkspaceRole
 
 __all__ = [
+    "AgentRun",
+    "AgentRunStatus",
+    "AgentType",
     "AuthSession",
     "AuthThrottle",
     "ActivityEvent",
