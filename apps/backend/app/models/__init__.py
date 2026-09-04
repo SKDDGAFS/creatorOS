@@ -56,6 +56,19 @@ from app.models.publishing import (
     PublishingState,
     PublishingTransition,
 )
+from app.models.research import (
+    Competitor,
+    ContentIdea,
+    FreshnessStatus,
+    ResearchFinding,
+    ResearchFindingEvidence,
+    ResearchFindingType,
+    ResearchHook,
+    ResearchRun,
+    ResearchRunStatus,
+    ResearchSource,
+    ResearchSourceType,
+)
 from app.models.user import User
 from app.models.video import Video, VideoStatus
 from app.models.video_metric import VideoMetric
@@ -81,8 +94,11 @@ __all__ = [
     "ApprovalRequest",
     "ApprovalStatus",
     "Channel",
+    "Competitor",
     "ConnectionStatus",
+    "ContentIdea",
     "DurableJob",
+    "FreshnessStatus",
     "GrowthSignal",
     "GrowthSignalProfile",
     "GrowthSignalWeight",
@@ -104,6 +120,14 @@ __all__ = [
     "PublishingState",
     "PublishingTransition",
     "RequestOutcome",
+    "ResearchFinding",
+    "ResearchFindingEvidence",
+    "ResearchFindingType",
+    "ResearchHook",
+    "ResearchRun",
+    "ResearchRunStatus",
+    "ResearchSource",
+    "ResearchSourceType",
     "SignalTier",
     "TikTokMetricExtension",
     "User",

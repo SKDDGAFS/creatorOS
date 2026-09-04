@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from app.models.growth_signal import GrowthSignalProfile
     from app.models.platform_integration import PlatformConnection
     from app.models.publishing import ActivityEvent, PublishingJob
+    from app.models.research import Competitor, ResearchRun, ResearchSource
     from app.models.user import User
 
 
@@ -119,6 +120,15 @@ class Workspace(Base):
         back_populates="workspace",
         cascade="save-update, merge",
         passive_deletes=True,
+    )
+    research_sources: Mapped[list[ResearchSource]] = relationship(
+        back_populates="workspace", cascade="save-update, merge", passive_deletes=True
+    )
+    competitors: Mapped[list[Competitor]] = relationship(
+        back_populates="workspace", cascade="save-update, merge", passive_deletes=True
+    )
+    research_runs: Mapped[list[ResearchRun]] = relationship(
+        back_populates="workspace", cascade="save-update, merge", passive_deletes=True
     )
 
 

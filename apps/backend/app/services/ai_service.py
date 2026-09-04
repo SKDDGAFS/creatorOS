@@ -419,6 +419,10 @@ def _validate_template(template: str) -> set[str]:
     return fields
 
 
+def get_template_fields(template: str) -> set[str]:
+    return _validate_template(template)
+
+
 def _render(template: str, variables: Mapping[str, str]) -> str:
     required = _validate_template(template)
     if required - variables.keys():

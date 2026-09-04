@@ -660,3 +660,39 @@ No migration is planned: Sprint J reuses the existing platform connection, accou
   PostgreSQL upgrade SQL.
 - Live PostgreSQL migration, schema-drift, and Compose checks remain pending
   because Docker is not installed in this environment.
+
+# Sprint N implementation plan: research worker
+
+## Scope
+
+1. Add workspace-owned research sources with type, evidence link, publisher,
+   bounded excerpt/metadata, source and retrieval dates, freshness window, and
+   content fingerprint.
+2. Add workspace-owned YouTube, Instagram, and TikTok competitor records.
+3. Add research runs linked to the requester, exact prompt version, durable job,
+   optional AI invocation, model, cost, summary, freshness counts, lifecycle,
+   safe errors, and activity events.
+4. Add strict output schemas for trend/content-pattern findings, evidence
+   links, hooks, and platform-aware content ideas.
+5. Reject stale sources unless explicitly allowed and reject any model citation
+   outside the run's source set.
+6. Deduplicate exact normalized artifacts per workspace while retaining
+   first-seen and last-seen run provenance.
+7. Require the research system prompt to carry an injection safety contract;
+   treat all excerpts and competitor notes as untrusted data.
+8. Expose authorized source, competitor, run, cancellation, finding, hook, and
+   idea APIs without adding a crawler or arbitrary fetch endpoint.
+
+## Safety and verification
+
+- The workflow accepts user- or official-adapter-supplied evidence only. It
+  does not scrape, bypass access controls, contact platforms in tests, or
+  require a paid API.
+- Public and official links must be credential-free HTTPS, but the application
+  does not fetch them.
+- Revision `0014` adds seven research tables and direct activity linkage with
+  named constraints, indexes, and downgrade support.
+- Ruff and mypy pass, all 109 backend tests pass, and Alembic reports `0014` as
+  the single head while rendering the complete offline PostgreSQL upgrade.
+- Live PostgreSQL migration, schema-drift, and Compose checks remain pending
+  because Docker is not installed in this environment.

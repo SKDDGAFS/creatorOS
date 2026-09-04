@@ -465,3 +465,36 @@ and reports that every registered agent has `can_publish=false` and
 Successful responses expose the chosen model, estimated cost, strict structured
 output, and confidence. Failed responses expose fixed safe errors only. See
 `../../docs/AGENT_RUNS.md` for prompt fields and worker registration.
+
+## Research
+
+Research routes store and analyze bounded evidence; they do not fetch arbitrary
+URLs. Source and competitor writes require workspace write access and CSRF.
+Run scheduling also requires an `Idempotency-Key`, while cancellation requires
+owner/admin access.
+
+```text
+POST   /api/research/sources
+GET    /api/research/sources
+POST   /api/research/competitors
+GET    /api/research/competitors
+POST   /api/research/runs
+GET    /api/research/runs
+GET    /api/research/runs/{run_id}
+POST   /api/research/runs/{run_id}/cancel
+GET    /api/research/findings
+GET    /api/research/hooks
+GET    /api/research/content-ideas
+```
+
+Public-web and official-API sources require a credential-free HTTPS link,
+source date, freshness window, title, and excerpt. Duplicate content returns the
+existing workspace record. A research run accepts one to ten unique source IDs
+and up to twenty competitor IDs. All must resolve in the active workspace.
+
+The active `research.analyze` prompt is captured immutably at scheduling. Its
+system template must contain `{safety_contract}` and its user template must
+contain `{objective}`, `{sources_json}`, and `{competitors_json}`. Structured
+output is rejected if any finding, hook, or idea cites a source outside the
+scheduled set. See
+`../../docs/RESEARCH_WORKER.md` for the full trust and freshness model.

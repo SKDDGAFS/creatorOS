@@ -161,3 +161,22 @@
 - [x] Complete 105 tests, lint, typing, offline migration, and diff checks.
 - [ ] Apply migration `0013` and run live PostgreSQL schema drift when Docker is
   available.
+
+# Research worker checklist
+
+- [x] Add workspace-owned dated research sources with HTTPS evidence links,
+  bounded excerpts/metadata, freshness windows, and content deduplication.
+- [x] Add workspace-owned platform competitor records.
+- [x] Add idempotent durable research runs tied to an exact prompt version and
+  optional successful AI invocation.
+- [x] Require an explicit stale-source opt-in and record fresh/stale counts.
+- [x] Mark excerpts and competitor notes as untrusted prompt data and require a
+  system safety contract.
+- [x] Validate structured findings, evidence links, hooks, and content ideas;
+  reject citations outside the scheduled source set.
+- [x] Deduplicate artifacts per workspace while tracking first/last seen runs.
+- [x] Add workspace APIs, administrator cancellation, activity events,
+  migration `0014`, tests, and documentation.
+- [x] Complete 109 tests, lint, typing, and offline migration verification.
+- [ ] Apply migration `0014` and run live PostgreSQL schema drift when Docker is
+  available.

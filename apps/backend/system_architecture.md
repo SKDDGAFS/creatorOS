@@ -415,3 +415,23 @@ Input references are workspace-validated typed IDs serialized into a bounded
 prompt variable. The output contract is advisory and cannot mutate publishing
 state. Workspace IDs are checked on every schedule, lookup, list,
 cancellation, and worker join.
+
+## Evidence-bound research
+
+`ResearchSource` stores a bounded excerpt, immutable source date, retrieval
+time, freshness window, safe link, and per-workspace content fingerprint.
+`Competitor` stores workspace-owned comparison context. Neither record triggers
+network access.
+
+`ResearchRun` captures source/competitor IDs and the exact `research.analyze`
+prompt version before it enqueues `research.analyze`. The worker serializes
+records into explicitly untrusted JSON, routes through the workspace AI policy,
+validates `ResearchOutput`, then verifies every cited source against the run's
+approved set. Only after those checks does one transaction persist findings,
+evidence links, hooks, ideas, invocation linkage, cost, summary, status, and the
+success activity event.
+
+Artifact fingerprints are workspace unique. Repeated output updates last-seen
+provenance rather than inserting duplicates. Findings retain first/last run
+links, evidence rows, source date, freshness, and confidence. No research
+worker has a browser, shell, messaging, or publishing capability.

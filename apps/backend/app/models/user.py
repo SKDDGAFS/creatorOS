@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from app.models.password_reset_token import PasswordResetToken
     from app.models.platform_integration import PlatformConnection
     from app.models.publishing import PublishingJob
+    from app.models.research import Competitor, ResearchRun, ResearchSource
     from app.models.workspace import WorkspaceMembership
 
 
@@ -104,6 +105,17 @@ class User(Base):
         passive_deletes=True,
     )
     agent_runs_requested: Mapped[list[AgentRun]] = relationship(
+        back_populates="requested_by",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    research_sources_created: Mapped[list[ResearchSource]] = relationship(
+        back_populates="created_by", cascade="save-update, merge", passive_deletes=True
+    )
+    competitors_created: Mapped[list[Competitor]] = relationship(
+        back_populates="created_by", cascade="save-update, merge", passive_deletes=True
+    )
+    research_runs_requested: Mapped[list[ResearchRun]] = relationship(
         back_populates="requested_by",
         cascade="save-update, merge",
         passive_deletes=True,

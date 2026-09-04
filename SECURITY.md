@@ -144,3 +144,21 @@ include credentials, tokens, personal data, or exploit details in a public issue
   requires an owner or administrator.
 - Raw provider responses and exception details are converted to safe messages
   before they reach run or activity records.
+
+## Research boundary
+
+- Research ingestion stores bounded user- or official-adapter-supplied evidence
+  and never fetches submitted URLs. It does not crawl, bypass access controls,
+  or circumvent platform rules.
+- Public and official evidence links must use credential-free HTTPS. Excerpts,
+  metadata, source counts, objective size, and run references are bounded.
+- Every source has a source date and freshness window. Stale evidence requires
+  explicit opt-in and remains labeled stale.
+- The research system prompt must contain the safety contract. Excerpts and
+  competitor notes are marked untrusted and cannot grant browsing, shell,
+  messaging, publishing, or other tools.
+- Structured model output can cite only workspace sources captured by the run.
+  Invented citations fail before any finding, hook, or idea is committed.
+- Workspace-level fingerprints deduplicate results. Run, source, competitor,
+  evidence, finding, hook, idea, invocation, job, and activity access is scoped
+  to the active workspace.

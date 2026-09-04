@@ -35,6 +35,9 @@ The repository contains:
 - a controlled agent-run framework with immutable prompt selection, typed
   recommendation output, durable retries, cost/confidence records, and no
   publishing or shell capability;
+- a local-first research worker with dated sources, competitor records,
+  freshness controls, evidence-linked findings, hooks, ideas, deduplication,
+  and prompt-injection containment;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -124,3 +127,5 @@ development skills into reviewed CreatorOS capabilities is in
 `docs/AI_PROVIDERS.md`.
 Agent capabilities, prompt contracts, scheduling, and worker registration are
 documented in `docs/AGENT_RUNS.md`.
+The compliant evidence-ingestion and research workflow is documented in
+`docs/RESEARCH_WORKER.md`.

@@ -23,6 +23,7 @@ from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
     from app.models.agent_run import AgentRun
+    from app.models.research import ResearchRun
     from app.models.user import User
     from app.models.video import Video
     from app.models.workspace import Workspace
@@ -70,6 +71,12 @@ class ActivityType(str, Enum):
     AGENT_RUN_FAILED = "agent_run_failed"
     AGENT_RUN_SUCCEEDED = "agent_run_succeeded"
     AGENT_RUN_CANCELLED = "agent_run_cancelled"
+    RESEARCH_RUN_SCHEDULED = "research_run_scheduled"
+    RESEARCH_RUN_STARTED = "research_run_started"
+    RESEARCH_RUN_RETRY_SCHEDULED = "research_run_retry_scheduled"
+    RESEARCH_RUN_FAILED = "research_run_failed"
+    RESEARCH_RUN_SUCCEEDED = "research_run_succeeded"
+    RESEARCH_RUN_CANCELLED = "research_run_cancelled"
 
 
 PUBLISHING_STATES = ", ".join(f"'{state.value}'" for state in PublishingState)
@@ -276,7 +283,10 @@ class ActivityEvent(Base):
             "'analytics_sync_succeeded', 'analytics_sync_skipped', "
             "'agent_run_scheduled', 'agent_run_started', "
             "'agent_run_retry_scheduled', 'agent_run_failed', "
-            "'agent_run_succeeded', 'agent_run_cancelled')",
+            "'agent_run_succeeded', 'agent_run_cancelled', "
+            "'research_run_scheduled', 'research_run_started', "
+            "'research_run_retry_scheduled', 'research_run_failed', "
+            "'research_run_succeeded', 'research_run_cancelled')",
             name="event_type_allowed",
         ),
     )
@@ -301,6 +311,11 @@ class ActivityEvent(Base):
         nullable=True,
         index=True,
     )
+    research_run_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_runs.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
     event_type: Mapped[str] = mapped_column(String(60), index=True)
     event_data: Mapped[dict[str, Any]] = mapped_column(
         JSON().with_variant(JSONB(), "postgresql"),
@@ -319,3 +334,6 @@ class ActivityEvent(Base):
         back_populates="activity_events"
     )
     agent_run: Mapped[AgentRun | None] = relationship(back_populates="activity_events")
+    research_run: Mapped[ResearchRun | None] = relationship(
+        back_populates="activity_events"
+    )
