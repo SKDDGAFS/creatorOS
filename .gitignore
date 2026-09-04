@@ -1,6 +1,16 @@
-﻿.env
+.env
 .env.*
 !.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials.json
+secrets.json
+secrets.yaml
+secrets.yml
 venv/
 .venv/
 __pycache__/

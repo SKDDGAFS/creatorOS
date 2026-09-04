@@ -4,10 +4,11 @@
 
 CreatorOS is an early local-development project. The API enforces opaque
 database-backed sessions, Argon2id password hashing, CSRF checks on authenticated
-writes, login throttling, workspace roles, and record-level ownership. It does
-not yet provide production secret management, general request limits, security
-monitoring, or hardened reverse-proxy controls. Do not expose the dashboard, API,
-or PostgreSQL service to the public internet.
+writes, login throttling, workspace roles, record-level ownership, trusted-host
+validation, restricted CORS, production-disabled API docs, and baseline browser
+security headers. It does not yet provide production secret management, general
+request limits, security monitoring, or hardened reverse-proxy controls. Do not
+expose the dashboard, API, or PostgreSQL service to the public internet.
 
 The credentials in `apps/backend/docker-compose.yml` and `.env.example` are
 development defaults only. Production credentials must be unique, stored in a
@@ -44,7 +45,7 @@ include credentials, tokens, personal data, or exploit details in a public issue
 ## Required controls before public deployment
 
 - Rate limiting and request-size limits.
-- Production-safe CORS and trusted-host configuration.
+- A reviewed production `FRONTEND_ORIGIN` and `TRUSTED_HOSTS` allowlist.
 - Centralized secrets, structured logs, and security monitoring.
 - PostgreSQL network isolation, TLS, backups, and a tested restore procedure.
 

@@ -1,5 +1,7 @@
 import re
 from functools import lru_cache
+from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,10 +18,11 @@ class Settings(BaseSettings):
     )
 
     application_name: str = "CreatorOS API"
-    environment: str = "development"
+    environment: Literal["development", "test", "production"] = "development"
     debug: bool = False
-    database_url: str = "postgresql+psycopg://127.0.0.1/creatoros"
+    database_url: SecretStr = SecretStr("postgresql+psycopg://127.0.0.1/creatoros")
     frontend_origin: str = "http://localhost:3000"
+    trusted_hosts: str = "localhost,127.0.0.1,testserver"
     session_cookie_name: str = "creatoros_session"
     csrf_cookie_name: str = "creatoros_csrf"
     session_cookie_secure: bool = False
@@ -69,10 +72,36 @@ class Settings(BaseSettings):
     def empty_optional_secrets_are_unset(cls, value: object) -> object:
         return None if value == "" else value
 
+    @field_validator("frontend_origin")
+    @classmethod
+    def validate_frontend_origin(cls, value: str) -> str:
+        parsed = urlsplit(value)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+            or parsed.query
+            or parsed.fragment
+            or parsed.path not in {"", "/"}
+        ):
+            raise ValueError("FRONTEND_ORIGIN must be an HTTP(S) origin without a path")
+        return value.rstrip("/")
+
     @model_validator(mode="after")
     def require_secure_production_cookies(self) -> Settings:
-        if self.environment.lower() == "production" and not self.session_cookie_secure:
+        if self.environment == "production" and self.debug:
+            raise ValueError("DEBUG must be false in production")
+        if self.environment == "production" and not self.session_cookie_secure:
             raise ValueError("SESSION_COOKIE_SECURE must be true in production")
+        if self.environment == "production" and not self.frontend_origin.startswith(
+            "https://"
+        ):
+            raise ValueError("FRONTEND_ORIGIN must use HTTPS in production")
+        if not self.allowed_hosts:
+            raise ValueError("TRUSTED_HOSTS must include at least one hostname")
+        if self.environment == "production" and "*" in self.allowed_hosts:
+            raise ValueError("TRUSTED_HOSTS cannot contain a wildcard in production")
         if bool(self.youtube_client_id) != bool(self.youtube_client_secret):
             raise ValueError(
                 "YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET must be set together"
@@ -86,13 +115,13 @@ class Settings(BaseSettings):
                 "TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET must be set together"
             )
         if (
-            self.environment.lower() == "production"
+            self.environment == "production"
             and self.youtube_client_id
             and not self.youtube_oauth_redirect_uri.startswith("https://")
         ):
             raise ValueError("YOUTUBE_OAUTH_REDIRECT_URI must use HTTPS in production")
         if (
-            self.environment.lower() == "production"
+            self.environment == "production"
             and self.instagram_app_id
             and not self.instagram_oauth_redirect_uri.startswith("https://")
         ):
@@ -100,7 +129,7 @@ class Settings(BaseSettings):
                 "INSTAGRAM_OAUTH_REDIRECT_URI must use HTTPS in production"
             )
         if (
-            self.environment.lower() == "production"
+            self.environment == "production"
             and self.tiktok_client_key
             and not self.tiktok_oauth_redirect_uri.startswith("https://")
         ):
@@ -138,6 +167,18 @@ class Settings(BaseSettings):
             for host in self.ai_allowed_local_provider_hosts.split(",")
             if host.strip()
         )
+
+    @property
+    def allowed_hosts(self) -> tuple[str, ...]:
+        return tuple(
+            host.strip().lower().rstrip(".")
+            for host in self.trusted_hosts.split(",")
+            if host.strip()
+        )
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment == "production"
 
 
 @lru_cache
