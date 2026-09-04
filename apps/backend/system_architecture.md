@@ -435,3 +435,17 @@ Artifact fingerprints are workspace unique. Repeated output updates last-seen
 provenance rather than inserting duplicates. Findings retain first/last run
 links, evidence rows, source date, freshness, and confidence. No research
 worker has a browser, shell, messaging, or publishing capability.
+
+## Strategy and outcomes
+
+`Recommendation` converts explicit metric evidence into a reviewable proposal.
+It delegates scoring to the existing immutable `GrowthSignalProfile`, so
+configured weights, sample thresholds, evidence coverage, and source confidence
+determine the stored confidence. Evidence may link to workspace research
+findings but never substitutes inference for a measured signal.
+
+The service owns a closed status graph and accepts result measurements only
+after work begins. `RecommendationOutcomeEvaluation` aggregates relative change
+weighted by sample size and scales confidence by observed volume. Zero baselines
+remain unavailable for relative-change math. Conclusions are associational and
+cannot trigger publishing or other external actions.

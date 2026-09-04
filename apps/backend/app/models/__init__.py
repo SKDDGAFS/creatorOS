@@ -56,6 +56,15 @@ from app.models.publishing import (
     PublishingState,
     PublishingTransition,
 )
+from app.models.recommendation import (
+    OutcomeConclusion,
+    Recommendation,
+    RecommendationEvidence,
+    RecommendationLevel,
+    RecommendationOutcomeEvaluation,
+    RecommendationResult,
+    RecommendationStatus,
+)
 from app.models.research import (
     Competitor,
     ContentIdea,
@@ -108,6 +117,7 @@ __all__ = [
     "JobStatus",
     "PasswordResetToken",
     "OAuthAuthorizationState",
+    "OutcomeConclusion",
     "Platform",
     "PlatformAccountMetricSnapshot",
     "PlatformConnection",
@@ -119,6 +129,12 @@ __all__ = [
     "PublishingJob",
     "PublishingState",
     "PublishingTransition",
+    "Recommendation",
+    "RecommendationEvidence",
+    "RecommendationLevel",
+    "RecommendationOutcomeEvaluation",
+    "RecommendationResult",
+    "RecommendationStatus",
     "RequestOutcome",
     "ResearchFinding",
     "ResearchFindingEvidence",

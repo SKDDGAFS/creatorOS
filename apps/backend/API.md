@@ -498,3 +498,25 @@ contain `{objective}`, `{sources_json}`, and `{competitors_json}`. Structured
 output is rejected if any finding, hook, or idea cites a source outside the
 scheduled set. See
 `../../docs/RESEARCH_WORKER.md` for the full trust and freshness model.
+
+## Strategy recommendations
+
+```text
+POST /api/recommendations
+GET  /api/recommendations
+GET  /api/recommendations/{recommendation_id}
+POST /api/recommendations/{recommendation_id}/status
+POST /api/recommendations/{recommendation_id}/results
+POST /api/recommendations/{recommendation_id}/evaluate
+```
+
+Creation requires a workspace growth-signal profile, proposed action, rationale,
+expected effect, uncertainty, impact/effort/risk levels, goal label, and one or
+more unique signal evidence rows. The server computes confidence from the
+profile's weights and sample rules. Exact normalized proposals are deduplicated
+per workspace.
+
+Results require an in-progress or completed recommendation. Evaluation stores a
+sample-weighted observed change, confidence, result count, and a conclusion of
+`supported`, `inconclusive`, or `not_supported`. All conclusions are explicitly
+correlational. See `../../docs/RECOMMENDATIONS.md`.

@@ -162,3 +162,16 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - Workspace-level fingerprints deduplicate results. Run, source, competitor,
   evidence, finding, hook, idea, invocation, job, and activity access is scoped
   to the active workspace.
+
+## Recommendation boundary
+
+- Recommendations are proposals only and cannot publish or contact platforms.
+- Confidence is computed from workspace-owned configurable signal weights,
+  sample thresholds, coverage, and source confidence; clients cannot set it.
+- Optional research findings and all scoring profiles are verified against the
+  active workspace before persistence.
+- Result windows and sample counts are validated. Outcome evaluation is
+  sample-weighted and always labeled correlational, never causal proof.
+- Common absolute causal claims are rejected, and uncertainty is required.
+- Status changes follow a closed lifecycle; results require an in-progress or
+  completed recommendation.

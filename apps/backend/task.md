@@ -180,3 +180,18 @@
 - [x] Complete 109 tests, lint, typing, and offline migration verification.
 - [ ] Apply migration `0014` and run live PostgreSQL schema drift when Docker is
   available.
+
+# Strategy and recommendation checklist
+
+- [x] Add workspace recommendations with action, rationale, expected effect,
+  uncertainty, impact, effort, risk, goal label, status, and deduplication.
+- [x] Link metric evidence and optional workspace research findings.
+- [x] Reuse configurable growth-signal weights to compute confidence and sample
+  size server-side.
+- [x] Enforce a closed recommendation lifecycle and correlational language.
+- [x] Add result measurements with valid windows and outcome evaluation.
+- [x] Persist sample-weighted change, confidence, conclusion, and uncertainty
+  interpretation.
+- [x] Add migration `0015`, authorized APIs, tests, and documentation.
+- [ ] Apply migration `0015` and run live PostgreSQL schema drift when Docker is
+  available.

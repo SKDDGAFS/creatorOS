@@ -38,6 +38,9 @@ The repository contains:
 - a local-first research worker with dated sources, competitor records,
   freshness controls, evidence-linked findings, hooks, ideas, deduplication,
   and prompt-injection containment;
+- an auditable strategy engine with weighted metric evidence, confidence,
+  impact/effort/risk estimates, goal labels, lifecycle tracking, and
+  correlational outcome evaluation;
 - a Next.js dashboard connected to the backend.
 
 CreatorOS is for local development only. Authentication and record ownership are
@@ -129,3 +132,5 @@ Agent capabilities, prompt contracts, scheduling, and worker registration are
 documented in `docs/AGENT_RUNS.md`.
 The compliant evidence-ingestion and research workflow is documented in
 `docs/RESEARCH_WORKER.md`.
+Recommendation scoring and outcome semantics are documented in
+`docs/RECOMMENDATIONS.md`.

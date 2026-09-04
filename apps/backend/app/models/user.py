@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from app.models.password_reset_token import PasswordResetToken
     from app.models.platform_integration import PlatformConnection
     from app.models.publishing import PublishingJob
+    from app.models.recommendation import Recommendation
     from app.models.research import Competitor, ResearchRun, ResearchSource
     from app.models.workspace import WorkspaceMembership
 
@@ -119,4 +120,7 @@ class User(Base):
         back_populates="requested_by",
         cascade="save-update, merge",
         passive_deletes=True,
+    )
+    recommendations_created: Mapped[list[Recommendation]] = relationship(
+        back_populates="created_by", cascade="save-update, merge", passive_deletes=True
     )

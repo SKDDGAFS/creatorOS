@@ -696,3 +696,31 @@ No migration is planned: Sprint J reuses the existing platform connection, accou
   the single head while rendering the complete offline PostgreSQL upgrade.
 - Live PostgreSQL migration, schema-drift, and Compose checks remain pending
   because Docker is not installed in this environment.
+
+# Sprint O implementation plan: strategy and recommendation engine
+
+## Scope
+
+1. Add workspace recommendations with proposed action, rationale, supporting
+   metrics, sample size, confidence, expected effect, uncertainty, impact,
+   effort, risk, linked goal label, status, and fingerprint.
+2. Reuse immutable growth-signal profiles as the configurable scoring policy;
+   clients cannot provide recommendation confidence directly.
+3. Link evidence rows to normalized signals and optional workspace research
+   findings.
+4. Add a closed proposed/accepted/in-progress/completed/dismissed lifecycle.
+5. Add measured baseline/outcome records with sample sizes and valid windows.
+6. Persist repeatable sample-weighted outcome evaluations with confidence and
+   supported/inconclusive/not-supported conclusions.
+7. Require uncertainty, reject common causal-certainty language, and label every
+   recommendation and evaluation as correlational.
+8. Expose workspace-scoped CRUD/lifecycle/result/evaluation APIs without any
+   publishing or external provider action.
+
+## Safety and verification
+
+- Cross-workspace profiles/findings are rejected and every route requires the
+  authenticated workspace; writes require CSRF.
+- Revision `0015` adds recommendations, evidence, results, and one-to-one outcome
+  evaluations with named constraints and rollback support.
+- Local execution is deterministic and requires no model or paid API.

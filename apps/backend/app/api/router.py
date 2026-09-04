@@ -10,6 +10,7 @@ from app.api.routes.health import router as health_router
 from app.api.routes.integrations import router as integrations_router
 from app.api.routes.jobs import router as jobs_router
 from app.api.routes.publishing import router as publishing_router
+from app.api.routes.recommendations import router as recommendations_router
 from app.api.routes.research import router as research_router
 from app.api.routes.videos import router as videos_router
 from app.api.routes.workspaces import router as workspaces_router
@@ -26,5 +27,6 @@ api_router.include_router(jobs_router)
 api_router.include_router(integrations_router)
 api_router.include_router(publishing_router)
 api_router.include_router(research_router)
+api_router.include_router(recommendations_router)
 api_router.include_router(channels_router)
 api_router.include_router(videos_router)
