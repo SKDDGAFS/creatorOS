@@ -232,9 +232,7 @@ def test_video_validation_and_duplicate_conflict(
 
     assert duplicate.status_code == 409
     assert duplicate.json() == {
-        "detail": (
-            "A video with this channel_id and platform_video_id already exists"
-        )
+        "detail": ("A video with this channel_id and platform_video_id already exists")
     }
 
 
@@ -257,9 +255,7 @@ def test_video_partial_update_filtering_and_pagination(
         f"/api/videos/{first['id']}",
         json={"title": "Updated Title"},
     )
-    filtered = client.get(
-        f"/api/videos?channel_id={channel['id']}&status=draft"
-    )
+    filtered = client.get(f"/api/videos?channel_id={channel['id']}&status=draft")
     paged = client.get("/api/videos?limit=1&offset=1")
 
     assert updated.status_code == 200
@@ -305,9 +301,7 @@ def test_metric_snapshots_are_appended_and_ordered(
         },
     )
     newest_first = client.get(f"/api/videos/{video['id']}/metrics")
-    oldest_first = client.get(
-        f"/api/videos/{video['id']}/metrics?order=oldest"
-    )
+    oldest_first = client.get(f"/api/videos/{video['id']}/metrics?order=oldest")
 
     assert older.status_code == 201
     assert newer.status_code == 201
@@ -340,6 +334,4 @@ def test_metric_validation_and_missing_video(client: TestClient) -> None:
 def test_list_query_limits_are_bounded(client: TestClient) -> None:
     assert client.get("/api/channels?limit=101").status_code == 422
     assert client.get("/api/videos?limit=0").status_code == 422
-    assert client.get(
-        f"/api/videos/{uuid4()}/metrics?order=invalid"
-    ).status_code == 422
+    assert client.get(f"/api/videos/{uuid4()}/metrics?order=invalid").status_code == 422

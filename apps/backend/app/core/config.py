@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     debug: bool = False
     database_url: str = "postgresql+psycopg://127.0.0.1/creatoros"
     frontend_origin: str = "http://localhost:3000"
+    storage_path: str = "storage"
+    max_upload_size_bytes: int = 500_000_000
 
 
 @lru_cache

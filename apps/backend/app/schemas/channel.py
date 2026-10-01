@@ -15,6 +15,7 @@ class ChannelBase(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     handle: str | None = Field(default=None, max_length=255)
     is_active: bool = True
+    is_authorized: bool = False
 
 
 class ChannelCreate(ChannelBase):

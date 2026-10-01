@@ -10,7 +10,7 @@ def create_application() -> FastAPI:
 
     application = FastAPI(
         title=settings.application_name,
-        description="AI Operating System for Creators",
+        description="Private single-user content scheduling and publishing assistant",
         version="0.1.0",
         debug=settings.debug,
     )
@@ -25,7 +25,7 @@ def create_application() -> FastAPI:
 
     @application.get("/")
     def home() -> dict[str, str]:
-        return {"message": "CreatorOS Brain is online \U0001f9e0"}
+        return {"message": "CreatorOS API is online"}
 
     application.include_router(api_router)
     return application

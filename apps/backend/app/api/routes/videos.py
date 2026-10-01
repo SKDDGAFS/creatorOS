@@ -1,19 +1,46 @@
+from pathlib import Path
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.errors import raise_service_http_error
+from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.video import Video, VideoStatus
 from app.models.video_metric import VideoMetric
 from app.schemas.video import VideoCreate, VideoResponse, VideoUpdate
 from app.schemas.video_metric import VideoMetricCreate, VideoMetricResponse
-from app.services import video_service
+from app.services import media_service, video_service
 from app.services.errors import ServiceError
 
 router = APIRouter(prefix="/videos", tags=["videos"])
+
+
+@router.post(
+    "/upload", response_model=VideoResponse, status_code=status.HTTP_201_CREATED
+)
+def upload_video(
+    channel_id: UUID = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+) -> Video:
+    settings = get_settings()
+    try:
+        return media_service.save_upload(
+            db,
+            channel_id=channel_id,
+            upload=file,
+            storage_root=Path(settings.storage_path),
+            max_size=settings.max_upload_size_bytes,
+        )
+    except ServiceError as exc:
+        raise_service_http_error(exc)
+    except ValueError as exc:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post(

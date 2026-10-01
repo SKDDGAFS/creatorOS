@@ -53,6 +53,9 @@ class Video(Base):
     )
     title: Mapped[str] = mapped_column(String(500))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    media_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    media_mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    media_size_bytes: Mapped[int | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(
         String(20),
         default=VideoStatus.DRAFT.value,

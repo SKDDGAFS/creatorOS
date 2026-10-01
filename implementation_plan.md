@@ -1,4 +1,15 @@
-# CreatorOS Backend Foundation Sprint
+# Current direction: simple CreatorOS
+
+CreatorOS is a private single-user content scheduling and publishing assistant.
+The simplification branch preserves Sprint 2 and repository hardening, replaces
+the placeholder analytics dashboard with five pages, and reads existing videos.
+Scheduling, recommendations, metadata preparation, and platform connections are
+future work. See `docs/SCHEDULING.md` for the proposed queue and service boundaries.
+No model or migration is added in the simplification sprint.
+
+The sprint notes below are historical records, not the current product roadmap.
+
+# CreatorOS Backend Foundation Sprint (historical)
 
 ## Current state
 

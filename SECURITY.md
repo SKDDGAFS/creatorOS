@@ -2,8 +2,10 @@
 
 ## Current deployment boundary
 
-CreatorOS is an early local-development project. The API does not yet enforce
-authentication, authorization, rate limits, or production secret management.
+CreatorOS is a private single-user local application. CreatorOS-level login is
+intentionally absent. The API does not enforce authentication, authorization,
+rate limits, or production secret management. Platform OAuth remains a separate
+future concern and does not make the local API safe for public access.
 Do not expose the dashboard, API, or PostgreSQL service to the public internet.
 
 The credentials in `apps/backend/docker-compose.yml` and `.env.example` are

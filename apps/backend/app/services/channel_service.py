@@ -56,10 +56,14 @@ def list_channels(
     if is_active is not None:
         statement = statement.where(Channel.is_active == is_active)
 
-    statement = statement.order_by(
-        Channel.created_at.asc(),
-        Channel.id.asc(),
-    ).offset(offset).limit(limit)
+    statement = (
+        statement.order_by(
+            Channel.created_at.asc(),
+            Channel.id.asc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
 
     return list(db.scalars(statement).all())
 

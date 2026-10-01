@@ -1,69 +1,46 @@
 "use client";
-
+import Link from "next/link";
 import { useEffect, useState } from "react";
-
-const apiUrl =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-  "http://127.0.0.1:8000";
-
+import { getQueue, type ScheduledPost } from "@/lib/api";
 export default function Home() {
-  const [status, setStatus] = useState("Connecting...");
-
-  useEffect(() => {
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        setStatus(data.message);
-      })
-      .catch(() => {
-        setStatus("Backend offline");
-      });
-  }, []);
-
+  const [next, setNext] = useState<ScheduledPost>();
+  useEffect(() => { getQueue().then((posts) => setNext(posts.find((post) => post.status === "scheduled"))).catch(() => undefined); }, []);
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      <div className="flex">
-        <aside className="min-h-screen w-64 border-r border-gray-800 p-6">
-          <h1 className="mb-8 text-2xl font-bold">CreatorOS</h1>
-
-          <nav className="space-y-4 text-gray-300">
-            <p>Home</p>
-            <p>Analytics</p>
-            <p>Publishing</p>
-            <p>Research</p>
-            <p>Ideas</p>
-            <p>AI Chat</p>
-            <p>Learning</p>
-          </nav>
-        </aside>
-
-        <section className="flex-1 p-10">
-          <h2 className="text-4xl font-bold">Welcome back</h2>
-
-          <p className="mt-2 text-gray-400">
-            Your AI creator assistant is ready.
+    <>
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Your publishing desk</p>
+          <h1>A little more room to create.</h1>
+          <p>Prepare your content. Plan when it goes out.</p>
+        </div>
+        <Link className="button" href="/content#add-content">
+          Add content
+        </Link>
+      </header>
+      <div className="cards">
+        <section className="card">
+          <p className="eyebrow">Next scheduled post</p>
+          <h2>{next ? String(next.metadata.title ?? next.metadata.caption ?? "Untitled") : "Your schedule starts here"}</h2>
+          <p>{next?.scheduled_at ? new Date(next.scheduled_at).toLocaleString() : "No scheduled posts yet."}</p>
+          <Link href="/schedule">View schedule →</Link>
+        </section>
+        <section className="card">
+          <p className="eyebrow">Recommended posting time</p>
+          <h2>No recommendation yet</h2>
+          <p>
+            CreatorOS does not invent recommended times. Recommendations remain unavailable.
           </p>
-
-          <p className="mt-5 text-green-400">{status}</p>
-
-          <div className="mt-10 grid grid-cols-3 gap-6">
-            <div className="rounded-xl border border-gray-800 p-6">
-              <h3 className="text-gray-400">Views</h3>
-              <p className="mt-2 text-3xl font-bold">--</p>
-            </div>
-
-            <div className="rounded-xl border border-gray-800 p-6">
-              <h3 className="text-gray-400">Subscribers</h3>
-              <p className="mt-2 text-3xl font-bold">--</p>
-            </div>
-
-            <div className="rounded-xl border border-gray-800 p-6">
-              <h3 className="text-gray-400">AI Recommendations</h3>
-              <p className="mt-2 text-3xl font-bold">--</p>
-            </div>
-          </div>
+          <span className="badge">Not available yet</span>
         </section>
       </div>
-    </main>
+      <section className="card">
+        <h2>Recent publishing activity</h2>
+        <p>
+          Automatic publishing is not available yet. You can browse existing
+          video records in Content.
+        </p>
+        <Link href="/content">Open content →</Link>
+      </section>
+    </>
   );
 }

@@ -1,7 +1,8 @@
 # CreatorOS
 
-CreatorOS is an early-stage intelligent assistant for creator research,
-publishing, analytics, and growth.
+CreatorOS is currently a private single-user content scheduling and publishing
+assistant. Its goal is to help you prepare content, recommend posting times,
+and schedule publishing. Performance data will quietly improve scheduling.
 
 ## Current status
 
@@ -10,11 +11,21 @@ The repository contains:
 - a FastAPI backend with synchronous SQLAlchemy, Psycopg 3, and Alembic;
 - local PostgreSQL 16 through Docker Compose;
 - channel, video, and metric APIs;
-- a Next.js dashboard connected to the backend.
+- a minimal Next.js interface: Home, Schedule, Content, Connections, Settings;
+- a paginated Content library that reads existing Video API records.
 
-CreatorOS is for local development only. It does not yet have authentication,
-authorization, rate limiting, or production secret management. Do not publish
-the application to the internet yet; see `SECURITY.md`.
+Home and Schedule clearly mark future scheduling and recommendation features.
+Connections shows placeholders for YouTube, Instagram, and TikTok, in that order.
+Settings displays local mode and the browser timezone. Uploads, metadata
+generation, scheduling persistence, recommendations, OAuth, and publishing are
+not implemented yet. There are no fabricated posting times or performance data.
+
+There is no CreatorOS login. The existing User table remains for compatibility
+with channel ownership references; it does not create a sign-in requirement.
+Future platform OAuth will authorize publishing separately from local app access.
+
+CreatorOS runs locally on your own machine. Keep its unauthenticated API and
+interface private; see `SECURITY.md` for the deployment boundary.
 
 ## Local setup
 
@@ -24,7 +35,7 @@ Start PostgreSQL:
 
 ```powershell
 cd .\apps\backend
-Copy-Item .env.example .env
+Copy-Item .env.example .env # Only on first setup; preserve an existing .env.
 docker compose up -d
 ```
 
@@ -46,7 +57,7 @@ In another terminal, run the dashboard:
 
 ```powershell
 cd .\apps\dashboard
-Copy-Item .env.example .env.local
+Copy-Item .env.example .env.local # Only if it does not already exist.
 npm ci
 npm run dev
 ```
@@ -87,3 +98,7 @@ npm audit --audit-level=high
 
 Architecture details are in `apps/backend/system_architecture.md`; API behavior
 is documented in `apps/backend/API.md`.
+
+The next phase is a local content preparation and scheduling queue with manual
+time selection. See `docs/SCHEDULING.md` for the proposed record and service
+boundaries. Platform integration requires a separate sprint.

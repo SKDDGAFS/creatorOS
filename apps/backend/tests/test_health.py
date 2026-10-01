@@ -21,7 +21,7 @@ def test_root_endpoint(client: TestClient) -> None:
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json() == {"message": "CreatorOS Brain is online \U0001f9e0"}
+    assert response.json() == {"message": "CreatorOS API is online"}
 
 
 def test_application_health_endpoint(client: TestClient) -> None:

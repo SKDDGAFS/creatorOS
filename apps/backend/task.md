@@ -1,3 +1,9 @@
+# Sprint history
+
+These checklists record earlier work. Current product scope is described in the
+root README and `docs/SCHEDULING.md`; earlier verification is not evidence of
+the current working tree's results.
+
 # Backend foundation checklist
 
 - [x] Add application configuration and package structure.

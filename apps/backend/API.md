@@ -5,12 +5,12 @@ documentation is available at `/docs`.
 
 ## Channels
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/channels` | Create a channel for an existing user |
-| `GET` | `/api/channels` | List and filter channels |
-| `GET` | `/api/channels/{channel_id}` | Get one channel |
-| `PATCH` | `/api/channels/{channel_id}` | Partially update one channel |
+| Method  | Path                         | Purpose                               |
+| ------- | ---------------------------- | ------------------------------------- |
+| `POST`  | `/api/channels`              | Create a channel for an existing user |
+| `GET`   | `/api/channels`              | List and filter channels              |
+| `GET`   | `/api/channels/{channel_id}` | Get one channel                       |
+| `PATCH` | `/api/channels/{channel_id}` | Partially update one channel          |
 
 Create request:
 
@@ -36,12 +36,13 @@ GET /api/channels?user_id={uuid}&platform=youtube&is_active=true&limit=20&offset
 
 ## Videos
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/videos` | Create a video for an existing channel |
-| `GET` | `/api/videos` | List and filter videos |
-| `GET` | `/api/videos/{video_id}` | Get one video |
-| `PATCH` | `/api/videos/{video_id}` | Partially update one video |
+| Method  | Path                     | Purpose                                |
+| ------- | ------------------------ | -------------------------------------- |
+| `POST`  | `/api/videos`            | Create a video for an existing channel |
+| `GET`   | `/api/videos`            | List and filter videos                 |
+| `GET`   | `/api/videos/{video_id}` | Get one video                          |
+| `PATCH` | `/api/videos/{video_id}` | Partially update one video             |
+| `POST`  | `/api/videos/upload`     | Store a validated local video draft    |
 
 Create request:
 
@@ -60,6 +61,32 @@ Supported statuses are `draft`, `scheduled`, `published`, and `failed`.
 `platform_video_id` can remain null until an external platform assigns one.
 Any supplied `published_at` must contain a timezone offset.
 
+Uploads use multipart form data with `channel_id` and `file`. Only MP4, MOV,
+WebM, and AVI are accepted. Files are stored under the configured local
+`STORAGE_PATH` with UUID names and the configured size limit; no platform upload
+or publishing occurs.
+
+## Local setup and scheduling
+
+| Method  | Path                             | Purpose                                                               |
+| ------- | -------------------------------- | --------------------------------------------------------------------- |
+| `POST`  | `/api/local/setup`               | Idempotently create the local owner and un-authorized target channels |
+| `POST`  | `/api/scheduled-posts`           | Create a draft or scheduled post                                      |
+| `GET`   | `/api/scheduled-posts`           | List the local queue                                                  |
+| `PATCH` | `/api/scheduled-posts/{post_id}` | Edit metadata, reschedule, or cancel                                  |
+
+The setup endpoint creates one local target per platform with
+`is_authorized: false`. It never creates OAuth credentials. Scheduled posts
+reference both a video and target channel; mismatches are rejected. Metadata is
+editable and platform-specific: YouTube uses `title`, `description`, `tags`, and
+`is_short`; Instagram and TikTok use `caption` and `hashtags`.
+
+`scheduled_at` and `recommended_at` must be offset-aware instants and are stored
+in UTC. The selected IANA `timezone` is retained for editing. For a repeated DST
+wall-clock time, the client must resolve the intended offset explicitly; the API
+does not guess. Recommendations remain unavailable and `recommended_at` stays
+null unless a caller supplies a real value.
+
 List filters:
 
 ```text
@@ -68,10 +95,10 @@ GET /api/videos?channel_id={uuid}&status=published&limit=20&offset=0
 
 ## Metric snapshots
 
-| Method | Path | Purpose |
-| --- | --- | --- |
+| Method | Path                             | Purpose                  |
+| ------ | -------------------------------- | ------------------------ |
 | `POST` | `/api/videos/{video_id}/metrics` | Append a metric snapshot |
-| `GET` | `/api/videos/{video_id}/metrics` | Read metric history |
+| `GET`  | `/api/videos/{video_id}/metrics` | Read metric history      |
 
 Create request:
 
@@ -108,7 +135,7 @@ stable timestamp-and-UUID ordering.
 Missing records return:
 
 ```json
-{"detail": "Channel not found"}
+{ "detail": "Channel not found" }
 ```
 
 Uniqueness conflicts return HTTP `409` with a safe explanation. Pydantic input

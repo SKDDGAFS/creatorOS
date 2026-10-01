@@ -1,33 +1,35 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import { Navigation } from "@/components/navigation";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "CreatorOS",
-  description: "An intelligent operating system for creators.",
+  description: "Your private content scheduling and publishing assistant.",
 };
-
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <div className="shell">
+          <aside className="sidebar">
+            <Link className="brand" href="/">
+              CreatorOS<span>Personal publishing</span>
+            </Link>
+            <Navigation />
+            <p className="local-note">
+              Private · Local
+              <br />
+              One creator. Your own pace.
+            </p>
+          </aside>
+          <main id="main">{children}</main>
+        </div>
+      </body>
     </html>
   );
 }

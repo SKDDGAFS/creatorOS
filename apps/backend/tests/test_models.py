@@ -9,9 +9,7 @@ def constraint_names(model: type) -> set[str | None]:
 
 
 def test_all_domain_tables_are_registered() -> None:
-    assert {"users", "channels", "videos", "video_metrics"} <= set(
-        Base.metadata.tables
-    )
+    assert {"users", "channels", "videos", "video_metrics"} <= set(Base.metadata.tables)
 
 
 def test_models_use_uuid_primary_keys() -> None:
@@ -35,8 +33,7 @@ def test_user_email_has_a_unique_index() -> None:
 def test_channel_constraints_are_registered() -> None:
     assert "uq_channels_platform_platform_channel_id" in constraint_names(Channel)
     assert any(
-        isinstance(constraint, CheckConstraint)
-        and "youtube" in str(constraint.sqltext)
+        isinstance(constraint, CheckConstraint) and "youtube" in str(constraint.sqltext)
         for constraint in Channel.__table__.constraints
     )
 

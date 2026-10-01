@@ -58,10 +58,14 @@ def list_videos(
     if status is not None:
         statement = statement.where(Video.status == status.value)
 
-    statement = statement.order_by(
-        Video.created_at.asc(),
-        Video.id.asc(),
-    ).offset(offset).limit(limit)
+    statement = (
+        statement.order_by(
+            Video.created_at.asc(),
+            Video.id.asc(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
 
     return list(db.scalars(statement).all())
 

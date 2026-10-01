@@ -53,5 +53,8 @@ class VideoResponse(VideoBase):
     id: UUID
     channel_id: UUID
     published_at: datetime | None = None
+    media_path: str | None = None
+    media_mime_type: str | None = None
+    media_size_bytes: int | None = None
     created_at: datetime
     updated_at: datetime

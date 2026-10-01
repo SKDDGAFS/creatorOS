@@ -6,7 +6,9 @@
 - `app/api/router.py` owns the `/api` prefix and composes feature routers.
 - `app/api/routes/health.py` owns application and database readiness checks.
 - Root-level `main.py` is a compatibility entry point for `uvicorn main:app`.
-- The frontend and `docker-compose.yml` are outside this sprint's change boundary.
+- The frontend has Home, Schedule, Content, Connections, and Settings routes.
+  Content reads the paginated Video API. Future features are explicitly marked
+  as unavailable; there is no authentication UI or analytics dashboard.
 
 ## Configuration
 
@@ -34,6 +36,11 @@ postgresql+psycopg://creatoros:creatoros_password@127.0.0.1:5432/creatoros
   `Base.metadata.create_all()`.
 
 ## Domain model
+
+CreatorOS is currently a private single-user content scheduling and publishing
+assistant. The User model preserves existing channel foreign keys and API
+compatibility. No local sign-in or account management is required. Platform OAuth
+will have a separate credential lifecycle in a future sprint.
 
 - All four domain models use UUID primary keys. UUIDs allow future ingestion and
   distributed workflows to create identifiers without coordinating an integer
@@ -158,3 +165,18 @@ fields to nullable storage where needed. A genuine zero must remain distinct fro
 missing or unsupported platform data. Click-through rate is currently stored as
 a decimal ratio; future ingestion must record whether it was platform-reported or
 derived.
+
+## Scheduling direction
+
+Performance data is an internal input for scheduling. Existing VideoMetric
+snapshots, publication timestamps, channel references, indexes, and metric APIs
+remain intact. There is no recommendation algorithm or publisher in this sprint.
+
+The intended flow is frontend → FastAPI → PostgreSQL content/channel history →
+internal performance analysis → posting-time recommendation → user approval →
+platform publisher. Only the content/channel/history portion exists today.
+
+No new model or migration is needed for the current read-only foundation.
+`docs/SCHEDULING.md` at the repository root defines the smallest proposed queue
+record and future recommendation and metadata service contracts. A Video status
+of `scheduled` is historical data, not an executable publishing job.
