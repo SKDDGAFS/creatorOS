@@ -58,3 +58,17 @@ class VideoResponse(VideoBase):
     media_size_bytes: int | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class WatchFolderIngestRequest(BaseModel):
+    channel_id: UUID
+
+
+class IngestSkippedFile(BaseModel):
+    filename: str
+    reason: str
+
+
+class WatchFolderIngestResponse(BaseModel):
+    imported: list[VideoResponse]
+    skipped: list[IngestSkippedFile]

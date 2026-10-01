@@ -10,7 +10,13 @@ from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.video import Video, VideoStatus
 from app.models.video_metric import VideoMetric
-from app.schemas.video import VideoCreate, VideoResponse, VideoUpdate
+from app.schemas.video import (
+    VideoCreate,
+    VideoResponse,
+    VideoUpdate,
+    WatchFolderIngestRequest,
+    WatchFolderIngestResponse,
+)
 from app.schemas.video_metric import VideoMetricCreate, VideoMetricResponse
 from app.services import media_service, video_service
 from app.services.errors import ServiceError
@@ -41,6 +47,25 @@ def upload_video(
         from fastapi import HTTPException
 
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/ingest", response_model=WatchFolderIngestResponse)
+def ingest_watch_folder(
+    payload: WatchFolderIngestRequest,
+    db: Session = Depends(get_db),
+) -> WatchFolderIngestResponse:
+    settings = get_settings()
+    try:
+        imported, skipped = media_service.ingest_watch_folder(
+            db,
+            channel_id=payload.channel_id,
+            watch_folder=Path(settings.watch_folder_path),
+            storage_root=Path(settings.storage_path),
+            max_size=settings.max_upload_size_bytes,
+        )
+        return WatchFolderIngestResponse(imported=imported, skipped=skipped)
+    except ServiceError as exc:
+        raise_service_http_error(exc)
 
 
 @router.post(

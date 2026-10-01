@@ -104,3 +104,45 @@ def test_upload_rejects_type_and_cleans_oversized_file(
     assert invalid.status_code == 422
     assert oversized.status_code == 422
     assert list(tmp_path.rglob("*")) == []
+
+
+def test_watch_folder_ingests_supported_files_once_and_reports_skips(
+    client: TestClient,
+    db_session: Session,
+    tmp_path: Path,
+) -> None:
+    settings = get_settings()
+    settings.storage_path = str(tmp_path / "storage")
+    settings.watch_folder_path = str(tmp_path / "watch")
+    settings.max_upload_size_bytes = 4
+    user = add_user(db_session)
+    channel = create_channel(client, user)
+    watch_folder = Path(settings.watch_folder_path)
+    watch_folder.mkdir()
+    (watch_folder / "draft.mp4").write_bytes(b"clip")
+    (watch_folder / "notes.txt").write_text("not a video")
+    (watch_folder / "large.mov").write_bytes(b"oversized")
+
+    response = client.post(
+        "/api/videos/ingest",
+        json={"channel_id": channel["id"]},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [video["title"] for video in body["imported"]] == ["draft"]
+    assert {item["filename"] for item in body["skipped"]} == {
+        "notes.txt",
+        "large.mov",
+    }
+    stored_video = Path(settings.storage_path) / body["imported"][0]["media_path"]
+    assert stored_video.read_bytes() == b"clip"
+    assert len(list((watch_folder / "processed").iterdir())) == 1
+
+    repeated = client.post(
+        "/api/videos/ingest",
+        json={"channel_id": channel["id"]},
+    )
+    assert repeated.status_code == 200
+    assert repeated.json()["imported"] == []
+    assert len(client.get("/api/videos").json()) == 1

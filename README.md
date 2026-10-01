@@ -13,12 +13,14 @@ The repository contains:
 - channel, video, and metric APIs;
 - a minimal Next.js interface: Home, Schedule, Content, Connections, Settings;
 - a paginated Content library that reads existing Video API records.
+- local video upload and manual watch-folder import into the content library.
 
 Home and Schedule clearly mark future scheduling and recommendation features.
 Connections shows placeholders for YouTube, Instagram, and TikTok, in that order.
-Settings displays local mode and the browser timezone. Uploads, metadata
-generation, scheduling persistence, recommendations, OAuth, and publishing are
-not implemented yet. There are no fabricated posting times or performance data.
+Settings displays local mode and the browser timezone. Transcription, AI
+analysis, research, metadata generation, review/approval, recommendations,
+OAuth, publishing, and analytics collection are not implemented yet. There are
+no fabricated posting times or performance data.
 
 There is no CreatorOS login. The existing User table remains for compatibility
 with channel ownership references; it does not create a sign-in requirement.
@@ -64,6 +66,12 @@ npm run dev
 
 Open `http://localhost:3000`. The API documentation is at
 `http://127.0.0.1:8000/docs`.
+
+When the backend starts from `apps/backend`, its default watch folder is
+`apps/backend/watch`. Set `WATCH_FOLDER_PATH` in `.env` to use a different
+directory. In Content, select the intended local target and choose **Scan watch
+folder**. Successfully imported files move into `processed` under that folder.
+This is a manual scan; no background watcher or publishing job runs.
 
 ## Verification
 

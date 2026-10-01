@@ -43,6 +43,7 @@ GET /api/channels?user_id={uuid}&platform=youtube&is_active=true&limit=20&offset
 | `GET`   | `/api/videos/{video_id}` | Get one video                          |
 | `PATCH` | `/api/videos/{video_id}` | Partially update one video             |
 | `POST`  | `/api/videos/upload`     | Store a validated local video draft    |
+| `POST`  | `/api/videos/ingest`     | Import files from the local watch folder |
 
 Create request:
 
@@ -65,6 +66,14 @@ Uploads use multipart form data with `channel_id` and `file`. Only MP4, MOV,
 WebM, and AVI are accepted. Files are stored under the configured local
 `STORAGE_PATH` with UUID names and the configured size limit; no platform upload
 or publishing occurs.
+
+Watch-folder imports use `POST /api/videos/ingest` with JSON
+`{"channel_id": "<local-channel-uuid>"}`. The backend scans direct files in
+`WATCH_FOLDER_PATH` (default `watch`, relative to the backend process working
+directory), imports MP4, MOV, WebM, and AVI files using the upload size limit,
+and moves successfully imported files into a `processed` subfolder. Unsupported
+and oversized files stay in place and are returned in `skipped` with a reason.
+This is a manual scan; it does not run a background filesystem watcher.
 
 ## Local setup and scheduling
 

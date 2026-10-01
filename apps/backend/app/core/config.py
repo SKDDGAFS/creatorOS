@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://127.0.0.1/creatoros"
     frontend_origin: str = "http://localhost:3000"
     storage_path: str = "storage"
+    watch_folder_path: str = "watch"
     max_upload_size_bytes: int = 500_000_000
 
 
