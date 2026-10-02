@@ -4,11 +4,18 @@ export const apiUrl =
 export type Video = {
   id: string;
   channel_id: string;
+  platform: "youtube" | "instagram" | "tiktok";
   title: string;
   status: "draft" | "scheduled" | "published" | "failed";
   published_at: string | null;
   media_path: string | null;
   created_at: string;
+  transcript: string | null;
+  ai_analysis: Record<string, unknown> | null;
+  draft_metadata: {
+    platform: Video["platform"];
+    fields: Record<string, unknown>;
+  } | null;
 };
 export type Channel = {
   id: string;
@@ -62,9 +69,10 @@ export async function getVideos(
   offset: number,
   signal: AbortSignal,
   limit = 20,
+  refresh = 0,
 ): Promise<Video[]> {
   const response = await fetch(
-    `${apiUrl}/api/videos?limit=${limit}&offset=${offset}`,
+    `${apiUrl}/api/videos?limit=${limit}&offset=${offset}&refresh=${refresh}`,
     { signal, cache: "no-store" },
   );
   if (!response.ok) throw new Error("Content unavailable");
@@ -157,6 +165,16 @@ export function uploadVideo(channelId: string, file: File) {
   return json<Video>(`${apiUrl}/api/videos/upload`, {
     method: "POST",
     body: form,
+  });
+}
+export function prepareVideo(id: string) {
+  return json<Video>(`${apiUrl}/api/videos/${id}/prepare`, { method: "POST" });
+}
+export function updateVideo(id: string, payload: Record<string, unknown>) {
+  return json<Video>(`${apiUrl}/api/videos/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 }
 export function ingestWatchFolder(channelId: string) {

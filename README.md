@@ -12,15 +12,18 @@ The repository contains:
 - local PostgreSQL 16 through Docker Compose;
 - channel, video, and metric APIs;
 - a minimal Next.js interface: Home, Schedule, Content, Connections, Settings;
-- a paginated Content library that reads existing Video API records.
-- local video upload and manual watch-folder import into the content library.
+- a paginated Content library with transcript, analysis, and draft review;
+- local video upload and manual watch-folder import;
+- encrypted connected-account credential storage, not yet exposed through OAuth;
+- an Ollama AI provider contract and local video preparation endpoint.
 
-Home and Schedule clearly mark future scheduling and recommendation features.
-Connections shows placeholders for YouTube, Instagram, and TikTok, in that order.
-Settings displays local mode and the browser timezone. Transcription, AI
-analysis, research, metadata generation, review/approval, recommendations,
-OAuth, publishing, and analytics collection are not implemented yet. There are
-no fabricated posting times or performance data.
+Home and Schedule mark publishing and recommendation features as unavailable.
+Connections shows placeholders for YouTube, Instagram, and TikTok, in that
+order. Settings displays local mode and the browser timezone. Local transcription
+requires the optional Faster-Whisper dependency; analysis and metadata drafting
+require a running local Ollama model. Platform OAuth, upload, scheduling,
+analytics collection, and background watch-folder monitoring are not
+implemented. There are no fabricated posting times or performance data.
 
 There is no CreatorOS login. The existing User table remains for compatibility
 with channel ownership references; it does not create a sign-in requirement.
@@ -49,6 +52,29 @@ py -3.14 -m venv venv
 .\venv\Scripts\alembic.exe upgrade head
 ```
 
+For local video preparation, install Faster-Whisper and pull the configured
+Ollama model:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements-ai.txt
+ollama pull llama3.2
+```
+
+Set `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, or `WHISPER_MODEL` in `apps/backend/.env`
+to use different local services/models. Video bytes and transcripts are sent
+only to the configured local services.
+
+Before connecting platform accounts, generate a local encryption key and set
+`CREDENTIAL_ENCRYPTION_KEY` in `apps/backend/.env`:
+
+```powershell
+cd .\apps\backend
+.\venv\Scripts\python.exe -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Keep this key private and backed up; losing it makes stored platform credentials
+unreadable. The key is used only by the backend and is never sent to the browser.
+
 Run the backend:
 
 ```powershell
@@ -72,6 +98,8 @@ When the backend starts from `apps/backend`, its default watch folder is
 directory. In Content, select the intended local target and choose **Scan watch
 folder**. Successfully imported files move into `processed` under that folder.
 This is a manual scan; no background watcher or publishing job runs.
+Select a video in Content and choose **Generate transcript and draft** to run
+local preparation; review and save the generated metadata before scheduling.
 
 ## Verification
 

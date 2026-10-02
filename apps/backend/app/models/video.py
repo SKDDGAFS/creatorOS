@@ -4,6 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -56,6 +57,11 @@ class Video(Base):
     media_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     media_mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     media_size_bytes: Mapped[int | None] = mapped_column(nullable=True)
+    transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    ai_analysis: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    draft_metadata: Mapped[dict[str, object] | None] = mapped_column(
+        JSON, nullable=True
+    )
     status: Mapped[str] = mapped_column(
         String(20),
         default=VideoStatus.DRAFT.value,
@@ -86,3 +92,7 @@ class Video(Base):
         cascade="save-update, merge",
         passive_deletes=True,
     )
+
+    @property
+    def platform(self) -> str:
+        return self.channel.platform

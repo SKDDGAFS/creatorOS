@@ -2,7 +2,16 @@ from pathlib import Path
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.api.errors import raise_service_http_error
@@ -10,7 +19,10 @@ from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.video import Video, VideoStatus
 from app.models.video_metric import VideoMetric
+from app.providers.ai.base import AIProviderError
+from app.providers.ai.factory import get_ai_provider
 from app.schemas.video import (
+    IngestSkippedFile,
     VideoCreate,
     VideoResponse,
     VideoUpdate,
@@ -20,6 +32,7 @@ from app.schemas.video import (
 from app.schemas.video_metric import VideoMetricCreate, VideoMetricResponse
 from app.services import media_service, video_service
 from app.services.errors import ServiceError
+from app.services.video_preparation_service import prepare_video
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 
@@ -63,7 +76,29 @@ def ingest_watch_folder(
             storage_root=Path(settings.storage_path),
             max_size=settings.max_upload_size_bytes,
         )
-        return WatchFolderIngestResponse(imported=imported, skipped=skipped)
+        return WatchFolderIngestResponse(
+            imported=[VideoResponse.model_validate(video) for video in imported],
+            skipped=[IngestSkippedFile.model_validate(item) for item in skipped],
+        )
+    except ServiceError as exc:
+        raise_service_http_error(exc)
+
+
+@router.post("/{video_id}/prepare", response_model=VideoResponse)
+def prepare_local_video(
+    video_id: UUID,
+    db: Session = Depends(get_db),
+) -> Video:
+    settings = get_settings()
+    try:
+        return prepare_video(
+            db,
+            video_id,
+            provider=get_ai_provider(),
+            storage_root=Path(settings.storage_path),
+        )
+    except AIProviderError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ServiceError as exc:
         raise_service_http_error(exc)
 

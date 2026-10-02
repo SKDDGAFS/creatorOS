@@ -35,6 +35,7 @@ class VideoUpdate(BaseModel):
     description: str | None = None
     status: VideoStatus | None = None
     published_at: AwareDatetime | None = None
+    draft_metadata: dict[str, object] | None = None
 
     @model_validator(mode="after")
     def reject_null_for_required_fields(self) -> Self:
@@ -52,10 +53,14 @@ class VideoResponse(VideoBase):
 
     id: UUID
     channel_id: UUID
+    platform: str
     published_at: datetime | None = None
     media_path: str | None = None
     media_mime_type: str | None = None
     media_size_bytes: int | None = None
+    transcript: str | None = None
+    ai_analysis: dict[str, object] | None = None
+    draft_metadata: dict[str, object] | None = None
     created_at: datetime
     updated_at: datetime
 

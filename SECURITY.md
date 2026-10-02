@@ -24,6 +24,12 @@ include credentials, tokens, personal data, or exploit details in a public issue
 - If a secret is exposed, revoke or rotate it first, then remove it from code and
   history. Deleting the visible file is not sufficient.
 - Review dependency audit results before merging dependency changes.
+- OAuth state and platform access/refresh tokens are encrypted by the backend
+  before database writes. `CREDENTIAL_ENCRYPTION_KEY` stays in the local backend
+  environment and is never returned through API schemas or browser storage.
+- Back up the encryption key separately from the database. Losing it makes
+  stored credentials unrecoverable; rotating it requires re-encrypting existing
+  records before replacing the old key.
 
 ## Required controls before public deployment
 

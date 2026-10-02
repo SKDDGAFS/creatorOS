@@ -44,6 +44,7 @@ GET /api/channels?user_id={uuid}&platform=youtube&is_active=true&limit=20&offset
 | `PATCH` | `/api/videos/{video_id}` | Partially update one video             |
 | `POST`  | `/api/videos/upload`     | Store a validated local video draft    |
 | `POST`  | `/api/videos/ingest`     | Import files from the local watch folder |
+| `POST`  | `/api/videos/{video_id}/prepare` | Transcribe and prepare a local draft |
 
 Create request:
 
@@ -74,6 +75,17 @@ directory), imports MP4, MOV, WebM, and AVI files using the upload size limit,
 and moves successfully imported files into a `processed` subfolder. Unsupported
 and oversized files stay in place and are returned in `skipped` with a reason.
 This is a manual scan; it does not run a background filesystem watcher.
+
+Local preparation uses the configured Faster-Whisper model for transcription
+and sends transcript text to the configured Ollama service for analysis and
+metadata drafting. The API persists `transcript`, `ai_analysis`, and editable
+`draft_metadata` on the Video response. A missing Ollama service or optional
+Faster-Whisper install returns HTTP `503`; no platform is contacted and nothing
+is published.
+
+Connected platform credentials have a separate `Account` record and are
+encrypted by the backend using `CREDENTIAL_ENCRYPTION_KEY`. No OAuth or account
+management routes are available yet; `Channel` remains a local target.
 
 ## Local setup and scheduling
 

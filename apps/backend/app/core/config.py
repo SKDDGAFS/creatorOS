@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     storage_path: str = "storage"
     watch_folder_path: str = "watch"
     max_upload_size_bytes: int = 500_000_000
+    credential_encryption_key: str | None = None
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "llama3.2"
+    whisper_model: str = "small"
 
 
 @lru_cache

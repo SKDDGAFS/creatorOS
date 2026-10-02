@@ -19,6 +19,8 @@
 - `DEBUG`
 - `DATABASE_URL`
 - `FRONTEND_ORIGIN`
+- `CREDENTIAL_ENCRYPTION_KEY`
+- `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `WHISPER_MODEL`
 
 The safe template is `.env.example`. A real `.env` remains local and must not be
 committed. The expected local URL format is:
@@ -37,14 +39,25 @@ postgresql+psycopg://creatoros:creatoros_password@127.0.0.1:5432/creatoros
 
 ## Domain model
 
-CreatorOS is currently a private single-user content scheduling and publishing
-assistant. The User model preserves existing channel foreign keys and API
-compatibility. No local sign-in or account management is required. Platform OAuth
-will have a separate credential lifecycle in a future sprint.
+CreatorOS is a private, single-user content preparation and scheduling
+assistant. `Channel` remains a local preparation target. `Account` is a separate
+connected-platform identity with OAuth state, scopes, tokens, and connection
+status. There is no local sign-in requirement; OAuth authorizes a platform
+account, not access to CreatorOS.
 
-- All four domain models use UUID primary keys. UUIDs allow future ingestion and
+OAuth state and access/refresh tokens use an authenticated Fernet
+`TypeDecorator`; the database contains ciphertext, while ORM access decrypts
+inside the backend. A local `CREDENTIAL_ENCRYPTION_KEY` must be generated before
+credentials are written. It is not exposed by any response schema. Keep a
+separate backup of the key; key rotation requires an explicit re-encryption
+operation. No account connection endpoints or platform SDK calls are enabled
+yet.
+
+- All five domain models use UUID primary keys. UUIDs allow future ingestion and
   distributed workflows to create identifiers without coordinating an integer
   sequence.
+- Account records are independent of local channels. A platform account can be
+  connected later without reclassifying the existing preparation targets.
 - All timestamps are timezone-aware and generated in UTC.
 - Channel platforms and video statuses are stored as strings. Python enums define
   the application vocabulary, while named database `CHECK` constraints enforce it.
@@ -180,3 +193,18 @@ No new model or migration is needed for the current read-only foundation.
 `docs/SCHEDULING.md` at the repository root defines the smallest proposed queue
 record and future recommendation and metadata service contracts. A Video status
 of `scheduled` is historical data, not an executable publishing job.
+
+## Local AI and platform boundaries
+
+- `app/providers/ai/base.py` defines the provider contract for transcription,
+  analysis, metadata, topic ideation, and recommendation.
+- `OllamaProvider` sends text prompts only to the configured local Ollama URL.
+  `FasterWhisperTranscriber` is optional and loads its model locally. Topic
+  ideation is labeled unverified; sparse scheduling history returns unavailable.
+- `POST /api/videos/{video_id}/prepare` stores transcript, analysis, and
+  platform-specific metadata drafts on the existing local Video record.
+  Publishing is not invoked. Content provides the review and edit step.
+- `app/platforms/base.py` defines the common platform adapter contract. YouTube,
+  Instagram, and TikTok OAuth/publishing adapters remain future integrations;
+  platform app review, account eligibility, scopes, and credentials are
+  prerequisites, especially for TikTok and Instagram.

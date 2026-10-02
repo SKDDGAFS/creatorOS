@@ -1,20 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getVideos, type Video } from "@/lib/api";
+import { getVideos, prepareVideo, updateVideo, type Video } from "@/lib/api";
 export function ContentList() {
   const [offset, setOffset] = useState(0);
   const [attempt, setAttempt] = useState(0);
+  const [reviewVideo, setReviewVideo] = useState<Video | null>(null);
+  const [draft, setDraft] = useState({
+    title: "",
+    description: "",
+    caption: "",
+    tags: "",
+    hashtags: "",
+  });
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState("");
   const [state, setState] = useState<{
     kind: "loading" | "error" | "ready";
     videos: Video[];
   }>({ kind: "loading", videos: [] });
-  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt explicitly triggers a retry of the same page.
   useEffect(() => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     let active = true;
     setState({ kind: "loading", videos: [] });
-    getVideos(offset, controller.signal)
+    getVideos(offset, controller.signal, 20, attempt)
       .then((videos) => {
         if (active) setState({ kind: "ready", videos });
       })
@@ -52,7 +61,7 @@ export function ContentList() {
           {state.videos.length === 0 ? (
             <p>
               {offset === 0
-                ? "No video records yet. Uploads will be available in a later sprint."
+                ? "No videos yet. Upload a file or scan the local watch folder."
                 : "No more video records."}
             </p>
           ) : (
@@ -63,6 +72,7 @@ export function ContentList() {
                     <th>Title</th>
                     <th>Status</th>
                     <th>Published</th>
+                    <th>Review</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -77,6 +87,34 @@ export function ContentList() {
                           ? new Date(video.published_at).toLocaleString()
                           : "Not published"}
                       </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="button-secondary"
+                          onClick={() => {
+                            setReviewVideo(video);
+                            const fields = video.draft_metadata?.fields ?? {};
+                            const text = (key: string) => {
+                              const value = fields[key];
+                              return Array.isArray(value)
+                                ? value.join(" ")
+                                : typeof value === "string"
+                                  ? value
+                                  : "";
+                            };
+                            setDraft({
+                              title: text("title") || video.title,
+                              description: text("description"),
+                              caption: text("caption"),
+                              tags: text("tags"),
+                              hashtags: text("hashtags"),
+                            });
+                            setReviewMessage("");
+                          }}
+                        >
+                          Review
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -88,6 +126,201 @@ export function ContentList() {
             trigger publishing.
           </p>
         </>
+      )}
+      {reviewVideo && (
+        <div className="review-panel" aria-busy={reviewBusy}>
+          <h3>Review draft: {reviewVideo.title}</h3>
+          <p>
+            {reviewVideo.platform} · {reviewVideo.status}
+          </p>
+          <div className="review-grid">
+            {reviewVideo.platform === "youtube" ? (
+              <>
+                <label>
+                  Title
+                  <input
+                    value={draft.title}
+                    maxLength={100}
+                    onChange={(event) =>
+                      setDraft({ ...draft, title: event.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Description
+                  <textarea
+                    value={draft.description}
+                    maxLength={5000}
+                    onChange={(event) =>
+                      setDraft({ ...draft, description: event.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Tags
+                  <input
+                    value={draft.tags}
+                    onChange={(event) =>
+                      setDraft({ ...draft, tags: event.target.value })
+                    }
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <label>
+                  Caption
+                  <textarea
+                    value={draft.caption}
+                    maxLength={2200}
+                    onChange={(event) =>
+                      setDraft({ ...draft, caption: event.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Hashtags
+                  <input
+                    value={draft.hashtags}
+                    onChange={(event) =>
+                      setDraft({ ...draft, hashtags: event.target.value })
+                    }
+                  />
+                </label>
+              </>
+            )}
+          </div>
+          <div className="actions">
+            <button
+              type="button"
+              disabled={reviewBusy || !reviewVideo.media_path}
+              onClick={async () => {
+                setReviewBusy(true);
+                setReviewMessage("Preparing locally…");
+                try {
+                  const prepared = await prepareVideo(reviewVideo.id);
+                  setReviewVideo(prepared);
+                  const fields = prepared.draft_metadata?.fields ?? {};
+                  const text = (key: string) => {
+                    const value = fields[key];
+                    return Array.isArray(value)
+                      ? value.join(" ")
+                      : typeof value === "string"
+                        ? value
+                        : "";
+                  };
+                  setDraft({
+                    title: text("title") || prepared.title,
+                    description: text("description"),
+                    caption: text("caption"),
+                    tags: text("tags"),
+                    hashtags: text("hashtags"),
+                  });
+                  setState((current) =>
+                    current.kind === "ready"
+                      ? {
+                          ...current,
+                          videos: current.videos.map((video) =>
+                            video.id === prepared.id ? prepared : video,
+                          ),
+                        }
+                      : current,
+                  );
+                  setReviewMessage(
+                    "Local transcript and draft are ready to review.",
+                  );
+                } catch (error) {
+                  setReviewMessage(
+                    error instanceof Error
+                      ? error.message
+                      : "Preparation failed",
+                  );
+                } finally {
+                  setReviewBusy(false);
+                }
+              }}
+            >
+              Generate transcript and draft
+            </button>
+            <button
+              type="button"
+              className="button-secondary"
+              disabled={reviewBusy}
+              onClick={async () => {
+                setReviewBusy(true);
+                try {
+                  const fields =
+                    reviewVideo.platform === "youtube"
+                      ? {
+                          title: draft.title,
+                          description: draft.description,
+                          tags: draft.tags
+                            .split(",")
+                            .map((tag) => tag.trim())
+                            .filter(Boolean),
+                        }
+                      : {
+                          caption: draft.caption,
+                          hashtags: draft.hashtags.split(/\s+/).filter(Boolean),
+                        };
+                  const saved = await updateVideo(reviewVideo.id, {
+                    ...(reviewVideo.platform === "youtube"
+                      ? { title: draft.title }
+                      : {}),
+                    draft_metadata: {
+                      platform: reviewVideo.platform,
+                      fields,
+                    },
+                  });
+                  setReviewVideo(saved);
+                  setState((current) =>
+                    current.kind === "ready"
+                      ? {
+                          ...current,
+                          videos: current.videos.map((video) =>
+                            video.id === saved.id ? saved : video,
+                          ),
+                        }
+                      : current,
+                  );
+                  setReviewMessage(
+                    "Draft saved locally. Nothing was published.",
+                  );
+                } catch (error) {
+                  setReviewMessage(
+                    error instanceof Error
+                      ? error.message
+                      : "Could not save draft",
+                  );
+                } finally {
+                  setReviewBusy(false);
+                }
+              }}
+            >
+              Save draft
+            </button>
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={() => setReviewVideo(null)}
+            >
+              Close review
+            </button>
+          </div>
+          {reviewVideo.transcript && (
+            <details>
+              <summary>Transcript</summary>
+              <p>{reviewVideo.transcript}</p>
+            </details>
+          )}
+          {reviewVideo.ai_analysis && (
+            <details>
+              <summary>Local analysis</summary>
+              <pre>{JSON.stringify(reviewVideo.ai_analysis, null, 2)}</pre>
+            </details>
+          )}
+          {reviewMessage && <p role="status">{reviewMessage}</p>}
+        </div>
       )}
       <div className="actions">
         <button

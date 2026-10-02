@@ -1,7 +1,7 @@
 from sqlalchemy import CheckConstraint, UniqueConstraint, Uuid
 
 from app.db.base import Base
-from app.models import Channel, User, Video, VideoMetric
+from app.models import Account, Channel, User, Video, VideoMetric
 
 
 def constraint_names(model: type) -> set[str | None]:
@@ -9,11 +9,13 @@ def constraint_names(model: type) -> set[str | None]:
 
 
 def test_all_domain_tables_are_registered() -> None:
-    assert {"users", "channels", "videos", "video_metrics"} <= set(Base.metadata.tables)
+    assert {"users", "channels", "accounts", "videos", "video_metrics"} <= set(
+        Base.metadata.tables
+    )
 
 
 def test_models_use_uuid_primary_keys() -> None:
-    for model in (User, Channel, Video, VideoMetric):
+    for model in (User, Channel, Account, Video, VideoMetric):
         id_column = model.__table__.c.id
         assert id_column.primary_key
         assert isinstance(id_column.type, Uuid)
@@ -36,6 +38,31 @@ def test_channel_constraints_are_registered() -> None:
         isinstance(constraint, CheckConstraint) and "youtube" in str(constraint.sqltext)
         for constraint in Channel.__table__.constraints
     )
+
+
+def test_account_is_separate_and_has_expected_fields() -> None:
+    assert Account.__tablename__ != Channel.__tablename__
+    assert {
+        "id",
+        "user_id",
+        "platform",
+        "account_name",
+        "channel_id",
+        "is_connected",
+        "oauth_state",
+        "scopes",
+        "access_token",
+        "refresh_token",
+        "expires_at",
+        "last_error",
+        "created_at",
+    } == set(Account.__table__.columns.keys())
+    for name in ("oauth_state", "access_token", "refresh_token"):
+        assert (
+            Account.__table__.c[name].type.__class__.__name__
+            == "EncryptedCredential"
+        )
+    assert "uq_accounts_user_platform_channel" in constraint_names(Account)
 
 
 def test_video_constraints_and_nullable_platform_id_are_registered() -> None:
@@ -82,6 +109,7 @@ def test_video_metric_values_have_database_checks() -> None:
 def test_foreign_keys_are_restrictive() -> None:
     for column in (
         Channel.__table__.c.user_id,
+        Account.__table__.c.user_id,
         Video.__table__.c.channel_id,
         VideoMetric.__table__.c.video_id,
     ):
@@ -91,7 +119,9 @@ def test_foreign_keys_are_restrictive() -> None:
 
 def test_relationships_do_not_delete_related_records() -> None:
     relationships = (
+        User.accounts,
         User.channels,
+        Account.user,
         Channel.videos,
         Video.metrics,
     )
@@ -107,6 +137,8 @@ def test_timestamps_are_timezone_aware() -> None:
         User.__table__.c.updated_at,
         Channel.__table__.c.created_at,
         Channel.__table__.c.updated_at,
+        Account.__table__.c.expires_at,
+        Account.__table__.c.created_at,
         Video.__table__.c.published_at,
         Video.__table__.c.created_at,
         Video.__table__.c.updated_at,

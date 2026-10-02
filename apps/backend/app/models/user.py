@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, utc_now
 
 if TYPE_CHECKING:
+    from app.models.account import Account
     from app.models.channel import Channel
 
 
@@ -30,6 +31,11 @@ class User(Base):
     )
 
     channels: Mapped[list[Channel]] = relationship(
+        back_populates="user",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
+    accounts: Mapped[list[Account]] = relationship(
         back_populates="user",
         cascade="save-update, merge",
         passive_deletes=True,
